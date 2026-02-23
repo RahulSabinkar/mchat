@@ -13,6 +13,7 @@ export interface ScreeningSession {
   initialAnswers: Record<number, boolean>;
   initialScore: number | null;
   followUpRequired: boolean;
+  followUpAvailable: boolean;
   followUpAnswers: Record<number, FollowUpResult>;
   followUpScore: number | null;
   finalResult: ScreeningResultCategory | null;
@@ -37,6 +38,7 @@ export interface FollowUpResult {
   initialAnswer: boolean;
   flowState: FollowUpFlowState;
   finalScore: 0 | 1;
+  hearingTestResult?: string;
 }
 
 export interface FollowUpFlowState {

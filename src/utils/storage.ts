@@ -53,6 +53,7 @@ export function createNewSession(): ScreeningSession {
     initialAnswers: {},
     initialScore: null,
     followUpRequired: false,
+    followUpAvailable: false,
     followUpAnswers: {},
     followUpScore: null,
     finalResult: null,

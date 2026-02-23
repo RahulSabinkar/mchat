@@ -4,7 +4,8 @@ import {
   WelcomeScreen, 
   ChildInfoScreen, 
   QuestionsScreen, 
-  ResultsScreen 
+  ResultsScreen,
+  FollowUpScreen 
 } from '@/components/screens';
 
 function AppRoutes() {
@@ -31,6 +32,7 @@ function AppRoutes() {
       <Route path="/" element={<WelcomeScreen />} />
       <Route path="/info" element={<ChildInfoScreen />} />
       <Route path="/screen" element={<QuestionsScreen />} />
+      <Route path="/followup" element={<FollowUpScreen />} />
       <Route path="/results" element={<ResultsScreen />} />
       <Route path="*" element={<Navigate to={getRedirectPath()} replace />} />
     </Routes>

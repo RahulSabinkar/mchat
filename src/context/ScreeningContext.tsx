@@ -1,12 +1,12 @@
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
-import type { ScreeningSession, ChildInfo } from '@/types';
+import type { ScreeningSession, ChildInfo, FollowUpFlowState } from '@/types';
 import { 
   saveSession, 
   loadSession, 
   clearSession, 
   createNewSession 
 } from '@/utils/storage';
-import { calculateInitialScore, getRiskItemsFromAnswers } from '@/utils/scoring';
+import { calculateInitialScore, getRiskItemsFromAnswers, calculateFollowUpScore } from '@/utils/scoring';
 
 type ScreeningAction =
   | { type: 'INIT_SESSION'; payload: ScreeningSession }
@@ -15,8 +15,10 @@ type ScreeningAction =
   | { type: 'ANSWER_QUESTION'; payload: { questionNumber: number; answer: boolean } }
   | { type: 'SET_CURRENT_QUESTION'; payload: number }
   | { type: 'COMPLETE_INITIAL_QUESTIONS' }
-  | { type: 'SET_FOLLOW_UP_RESULT'; payload: { questionNumber: number; finalScore: 0 | 1 } }
-  | { type: 'COMPLETE_FOLLOW_UP'; payload: number }
+  | { type: 'INIT_FOLLOW_UP'; payload: { questionNumber: number; flowState: FollowUpFlowState } }
+  | { type: 'UPDATE_FOLLOW_UP_FLOW'; payload: { questionNumber: number; flowState: FollowUpFlowState } }
+  | { type: 'COMPLETE_FOLLOW_UP_QUESTION'; payload: { questionNumber: number; finalScore: 0 | 1; hearingTestResult?: string } }
+  | { type: 'COMPLETE_FOLLOW_UP' }
   | { type: 'SET_FINAL_RESULT'; payload: ScreeningSession['finalResult'] }
   | { type: 'RESET_SESSION' }
   | { type: 'GO_BACK' };
@@ -51,38 +53,78 @@ function screeningReducer(state: ScreeningSession, action: ScreeningAction): Scr
     case 'COMPLETE_INITIAL_QUESTIONS': {
       const initialScore = calculateInitialScore(state.initialAnswers);
       const riskItems = getRiskItemsFromAnswers(state.initialAnswers);
-      const followUpRequired = riskItems.length > 0 && initialScore >= 3 && initialScore <= 7;
+      const hasRiskItems = riskItems.length > 0;
+      const isModerateRisk = initialScore >= 3 && initialScore <= 7;
+      const isHighRisk = initialScore >= 8;
+      
+      // Follow-up is required for moderate risk (3-7), optional for high risk (8+)
+      const followUpRequired = hasRiskItems && isModerateRisk;
+      const followUpAvailable = hasRiskItems && (isModerateRisk || isHighRisk);
+      
       return {
         ...state,
         initialScore,
         followUpRequired,
+        followUpAvailable,
         phase: followUpRequired ? 'follow_up' : 'results',
         status: followUpRequired ? 'in_progress' : 'completed',
         finalResult: followUpRequired ? null : (initialScore <= 2 ? 'low' : 'high'),
       };
     }
     
-    case 'SET_FOLLOW_UP_RESULT': {
-      const { questionNumber, finalScore } = action.payload;
+    case 'INIT_FOLLOW_UP': {
+      const { questionNumber, flowState } = action.payload;
       const newFollowUpAnswers = {
         ...state.followUpAnswers,
         [questionNumber]: {
           questionNumber,
           initialAnswer: state.initialAnswers[questionNumber],
-          flowState: { currentNodeId: 'start', selectedOptions: {}, checkedItems: {} },
+          flowState,
+          finalScore: 0 as const,
+        },
+      };
+      return { ...state, followUpAnswers: newFollowUpAnswers };
+    }
+    
+    case 'UPDATE_FOLLOW_UP_FLOW': {
+      const { questionNumber, flowState } = action.payload;
+      const existingResult = state.followUpAnswers[questionNumber];
+      if (!existingResult) return state;
+      
+      const newFollowUpAnswers = {
+        ...state.followUpAnswers,
+        [questionNumber]: {
+          ...existingResult,
+          flowState,
+        },
+      };
+      return { ...state, followUpAnswers: newFollowUpAnswers };
+    }
+    
+    case 'COMPLETE_FOLLOW_UP_QUESTION': {
+      const { questionNumber, finalScore, hearingTestResult } = action.payload;
+      const existingResult = state.followUpAnswers[questionNumber];
+      if (!existingResult) return state;
+      
+      const newFollowUpAnswers = {
+        ...state.followUpAnswers,
+        [questionNumber]: {
+          ...existingResult,
           finalScore,
+          hearingTestResult,
         },
       };
       return { ...state, followUpAnswers: newFollowUpAnswers };
     }
     
     case 'COMPLETE_FOLLOW_UP': {
+      const followUpScore = calculateFollowUpScore(state.followUpAnswers);
       return {
         ...state,
-        followUpScore: action.payload,
+        followUpScore,
         phase: 'results',
         status: 'completed',
-        finalResult: action.payload >= 2 ? 'moderate_positive' : 'moderate_negative',
+        finalResult: followUpScore >= 2 ? 'moderate_positive' : 'moderate_negative',
       };
     }
     

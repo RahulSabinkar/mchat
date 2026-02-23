@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout';
 import { QuestionCard, ProgressBar } from '@/components/questions';
@@ -11,13 +12,20 @@ import {
 export function QuestionsScreen() {
   const navigate = useNavigate();
   const { session, dispatch } = useScreening();
-  const { currentQuestionIndex, initialAnswers, childInfo } = session;
+  const { currentQuestionIndex, initialAnswers, childInfo, phase } = session;
   
   const totalQuestions = getTotalQuestions();
   const question = getQuestionByIndex(currentQuestionIndex);
   
+  useEffect(() => {
+    if (phase === 'follow_up') {
+      navigate('/followup', { replace: true });
+    } else if (phase === 'results') {
+      navigate('/results', { replace: true });
+    }
+  }, [phase, navigate]);
+  
   if (!question) {
-    navigate('/results');
     return null;
   }
   
@@ -33,7 +41,6 @@ export function QuestionsScreen() {
     
     if (isLastQuestion) {
       dispatch({ type: 'COMPLETE_INITIAL_QUESTIONS' });
-      navigate('/results');
     }
   };
   
