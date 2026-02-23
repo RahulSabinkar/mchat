@@ -1,0 +1,97 @@
+{
+  "item_number": 12,
+  "question": "12. Does ____________ get upset by everyday noises?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "evaluate_triggers",
+        "No": {
+          "result_score": 0
+        }
+      }
+    },
+    "evaluate_triggers": {
+      "type": "checklist",
+      "instruction": "Does your child have a negative reaction to the sound of...",
+      "items": [
+        "A washing machine?",
+        "Babies crying?",
+        "Vacuum cleaner?",
+        "Hairdryer?",
+        "Traffic?",
+        "Babies squealing or screeching?",
+        "Loud music?",
+        "Telephone/ doorbell ringing?",
+        "Noisy places such as a supermarket or restaurant?",
+        "Other (describe): ________________________________________________"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_trigger_count"
+    },
+    "determine_trigger_count": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to one or none": {
+          "result_score": 0
+        },
+        "Yes to two or more": {
+          "next": "ask_how_react"
+        }
+      }
+    },
+    "ask_how_react": {
+      "type": "instruction",
+      "text": "How does your child react to those noises? (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "categories": {
+        "0_responses": {
+          "instruction": "Does your child...\n(Below are 0 responses)",
+          "items": [
+            "Calmly cover his/her ears?",
+            "Tell you that he/she does not like the noise?"
+          ]
+        },
+        "1_responses": {
+          "instruction": "Does your child...\n(Below are 1 responses)",
+          "items": ["Scream?", "Cry?", "Cover his/her ears while upset?"]
+        }
+      },
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes only to 0 example(s)": {
+          "result_score": 0
+        },
+        "Yes only to 1 example(s)": {
+          "result_score": 1
+        },
+        "Yes to both 0 and 1 examples": {
+          "next": "clarify_frequency"
+        }
+      }
+    },
+    "clarify_frequency": {
+      "type": "followup_question",
+      "text": "Which one does he/she do most often?",
+      "options": {
+        "0 response": {
+          "result_score": 0
+        },
+        "1 response": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

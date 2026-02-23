@@ -1,0 +1,48 @@
+{
+  "item_number": 15,
+  "question": "15. Does ____________ try to copy what you do?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": "evaluate_behaviors"
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example of something he/she would try to copy. (If parent does not give one of the following 0 examples, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does your child try to copy you if you...",
+      "items": [
+        "Stick out your tongue?",
+        "Make a funny sound?",
+        "Wave good bye?",
+        "Clap your hands?",
+        "Put your fingers to your lips to signal \"Shhh\"?",
+        "Blow a kiss?",
+        "Other (describe): ________________________________________________"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to two or more": {
+          "result_score": 0
+        },
+        "Yes to one or none": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

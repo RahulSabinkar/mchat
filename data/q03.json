@@ -1,0 +1,52 @@
+{
+  "item_number": 3,
+  "question": "3. Does ____________ play pretend or make-believe?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": "evaluate_behaviors"
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example of his/her pretend play. (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does he/she usually...",
+      "items": [
+        "Pretend to drink from a **toy** cup?",
+        "Pretend to eat from a **toy** spoon or fork?",
+        "Pretend to talk on the telephone?",
+        "Pretend to feed a doll or stuffed animal with real or imaginary food?",
+        "Push a car as if it is going along a pretend road?",
+        "Pretend to be a robot, an airplane, a ballerina, or any other favorite character?",
+        "Put a toy pot on a pretend stove?",
+        "Stir imaginary food?",
+        "Put an action figure or doll into a car or truck as if it is the driver or 0enger?",
+        "Pretend to vacuum the rug, sweep the floor, or the mow lawn?",
+        "Other (describe) ________________________________________________"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any": {
+          "result_score": 0
+        },
+        "No to all": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

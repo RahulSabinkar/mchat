@@ -1,0 +1,69 @@
+{
+  "item_number": 7,
+  "question": "7. * If the interviewer just asked #6, begin here: We just talked about pointing to ask for something, ASK ALL -> Does ____________ point with one finger just to show you something interesting?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": "evaluate_behaviors"
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example something he/she might point at to show you. (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does your child sometimes want you to see something interesting such as....",
+      "items": [
+        "An airplane in the sky?",
+        "A truck on the road?",
+        "A bug on the ground?",
+        "An animal in the yard?"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_checklist_score"
+    },
+    "determine_checklist_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any": {
+          "next": "how_draw_attention"
+        },
+        "No to all of the above": {
+          "result_score": 1
+        }
+      }
+    },
+    "how_draw_attention": {
+      "type": "followup_question",
+      "text": "How does your child draw your attention to it? Would he/she point with one finger?",
+      "options": {
+        "Yes": {
+          "next": "check_intent"
+        },
+        "No": {
+          "result_score": 1
+        }
+      }
+    },
+    "check_intent": {
+      "type": "followup_question",
+      "text": "Is this to show their interest, not to get help?",
+      "options": {
+        "Yes OR both to show interest and to get help": {
+          "result_score": 0
+        },
+        "No": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

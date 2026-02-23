@@ -1,0 +1,46 @@
+{
+  "item_number": 17,
+  "question": "17. Does ____________ try to get you to watch him/her?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_example",
+        "No": "evaluate_behaviors"
+      }
+    },
+    "ask_yes_example": {
+      "type": "instruction",
+      "text": "Please give me an example of how he/she would try to get you to watch him/her. (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does he/she...",
+      "items": [
+        "Say “Look!” or “Watch me!”?",
+        "Babble or make a noise to get you to watch what he/ she is doing?",
+        "Look at you to get praise or comment?",
+        "Keep looking to see if you are looking?",
+        "Other (describe): ________________________________________________"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any": {
+          "result_score": 0
+        },
+        "Yes to none": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

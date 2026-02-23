@@ -1,0 +1,59 @@
+{
+  "item_number": 6,
+  "question": "6. Does ____________ point with one finger to ask for something or to get help?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": "ask_no_followup"
+      }
+    },
+    "ask_no_followup": {
+      "type": "instruction",
+      "text": "If there is something your child wants that is out of reach, such as a snack or toy that is out of reach, how does he/she get it? (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does he/she...",
+      "items": [
+        "Reach for the object with his/her whole hand?",
+        "Lead you to the object?",
+        "Try to get the object for him/herself?",
+        "Ask for it using words or sounds?"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any of the above": {
+          "next": "show_me_prompt"
+        },
+        "No to all of the above": {
+          "result_score": 1
+        }
+      }
+    },
+    "show_me_prompt": {
+      "type": "followup_question",
+      "text": "If you said \"Show me,\" would he/she point at it?",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

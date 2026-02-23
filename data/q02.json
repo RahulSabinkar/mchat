@@ -1,0 +1,49 @@
+{
+  "item_number": 2,
+  "question": "2. You reported that you have wondered if you child is deaf. What led you to wonder that?",
+  "flow": {
+    "start": {
+      "type": "checklist",
+      "instruction": "Does he/she...",
+      "items": ["often ignore sounds?", "often ignore people?"],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "No to both": {
+          "result_score": 0,
+          "next": "hearing_test_check"
+        },
+        "Yes to either": {
+          "result_score": 1,
+          "next": "hearing_test_check"
+        }
+      }
+    },
+    "hearing_test_check": {
+      "type": "mandatory_followup",
+      "instruction": "ALSO ASK FOR ALL CHILDREN:",
+      "text": "Has your child’s hearing been tested?",
+      "options": {
+        "Yes": "hearing_test_results",
+        "No": "end"
+      }
+    },
+    "hearing_test_results": {
+      "type": "multiple_choice",
+      "text": "What were the results of the hearing test? (choose one):",
+      "options": [
+        "Hearing in normal range",
+        "Hearing below normal",
+        "Results inconclusive or not definitive"
+      ],
+      "next": "end"
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

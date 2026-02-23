@@ -1,0 +1,71 @@
+{
+  "item_number": 1,
+  "question": "1. If you point at something across the room, does ____________ look at it?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": "ask_no_followup"
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example of how he/she will respond if you point at something (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "ask_no_followup": {
+      "type": "instruction",
+      "text": "If you point at something, what does your child typically do?",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does he/she ...",
+      "categories": {
+        "0_examples": [
+          "Look at object?",
+          "Point to object?",
+          "Look and comment on object?",
+          "Look if you point and say \"look!\"?"
+        ],
+        "1_examples": [
+          "Ignores you?",
+          "Look around room randomly?",
+          "Look at your finger?"
+        ]
+      },
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes only to 0 example(s)": {
+          "result_score": 0
+        },
+        "Yes only to 1 example(s)": {
+          "result_score": 1
+        },
+        "Yes to both 0 and 1 example(s)": {
+          "next": "clarify_frequency"
+        }
+      }
+    },
+    "clarify_frequency": {
+      "type": "followup_question",
+      "text": "Which one does he/she do most often?",
+      "options": {
+        "Most often is 0 example": {
+          "result_score": 0
+        },
+        "Most often is 1 example": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

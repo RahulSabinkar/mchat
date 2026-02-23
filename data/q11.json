@@ -1,0 +1,73 @@
+{
+  "item_number": 11,
+  "question": "11. When you smile at ____________, does he/she smile back at you?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": "ask_no_followup"
+      }
+    },
+    "ask_no_followup": {
+      "type": "instruction",
+      "text": "What makes ____________ smile? (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "categories": {
+        "0_examples": {
+          "instruction": "Does your child...\n(Below are 0 examples)",
+          "items": [
+            "Smile when you smile?",
+            "Smile when you enter the room?",
+            "Smile when you return from being away?"
+          ]
+        },
+        "1_examples": {
+          "instruction": "Does he/she ...\n(Below are 1 examples)",
+          "items": [
+            "Always smile?",
+            "Smile at a favorite toy or activity?",
+            "Smile randomly or at nothing in particular?"
+          ]
+        }
+      },
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes only to 0 example(s)": {
+          "result_score": 0
+        },
+        "Yes only to 1 example(s)": {
+          "result_score": 1
+        },
+        "Yes to both 0 and 1 examples": {
+          "next": "clarify_frequency"
+        }
+      }
+    },
+    "clarify_frequency": {
+      "type": "followup_question",
+      "text": "Which one does he/she do most often?",
+      "options": {
+        "0 response": {
+          "result_score": 0
+        },
+        "1 response": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

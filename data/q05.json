@@ -1,0 +1,71 @@
+{
+  "item_number": 5,
+  "question": "5. Does _________ make unusual finger movements near his/her eyes?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": {
+          "result_score": 0
+        }
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please describe these movements (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "categories": {
+        "0_examples": {
+          "instruction": "Does he/she ...\n(Below are 0 examples)",
+          "items": ["Look at hands?", "Move fingers when playing peek-a-boo?"]
+        },
+        "1_examples": {
+          "instruction": "Does he/she...\n(Below are 1 examples)",
+          "items": [
+            "Wiggle his/her fingers near his/her eyes?",
+            "Hold his/her hands up close to his/her eyes?",
+            "Hold his/her hands off to the side of his/her eyes?",
+            "Flap his/her hands near his/her face?",
+            "Other (describe) ________________________________________________"
+          ]
+        }
+      },
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any of the above without any 1 items endorsed": {
+          "result_score": 0
+        },
+        "No to all of the above (1 examples)": {
+          "result_score": 0
+        },
+        "Yes to any of the above (1 examples)": {
+          "next": "check_frequency"
+        }
+      }
+    },
+    "check_frequency": {
+      "type": "followup_question",
+      "text": "Does this happen more than twice a week?",
+      "options": {
+        "No": {
+          "result_score": 0
+        },
+        "Yes": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

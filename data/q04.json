@@ -1,0 +1,40 @@
+{
+  "item_number": 4,
+  "question": "4. Does _________ like climbing on things?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": "evaluate_behaviors"
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example of something he/she enjoys climbing on. (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does he/she enjoy climbing on...",
+      "items": ["Stairs?", "Chairs?", "Furniture?", "Playground equipment?"],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any of the above": {
+          "result_score": 0
+        },
+        "No to all": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

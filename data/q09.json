@@ -1,0 +1,59 @@
+{
+  "item_number": 9,
+  "question": "9. Does ____________ show you things by bringing them to you or holding them up for you to see? Not just to get help, but to share?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": "ask_yes_followup",
+        "No": "evaluate_behaviors"
+      }
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example of something he/she might bring to show you or hold up for you to see. (If parent does not give one of the following 0 examples, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does your child sometimes bring you...",
+      "items": [
+        "A picture or toy just to show you?",
+        "A drawing he/she has done?",
+        "A flower he/she has picked?",
+        "A bug he/she has found in the grass?",
+        "A few blocks he/she has put together?",
+        "Other (describe): ________________________________________________"
+      ],
+      "options": ["Yes", "No"],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "decision_logic",
+      "conditions": {
+        "Yes to any of the above": {
+          "next": "check_intent"
+        },
+        "No to all of the above": {
+          "result_score": 1
+        }
+      }
+    },
+    "check_intent": {
+      "type": "followup_question",
+      "text": "Is this sometimes just to show you, not to get help?",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

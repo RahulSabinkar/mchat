@@ -1,0 +1,51 @@
+{
+  "item_number": 19,
+  "question": "19. If something new happens, does ____________ look at your face to see how you feel about it?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": "ask_strange_noise"
+      }
+    },
+    "ask_strange_noise": {
+      "type": "followup_question",
+      "text": "If your child hears a strange or scary noise, will he/she look at you **before** responding?",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": "ask_someone_new"
+      }
+    },
+    "ask_someone_new": {
+      "type": "followup_question",
+      "text": "Does your child **look at you** when someone new approaches?",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": "ask_unfamiliar_scary"
+      }
+    },
+    "ask_unfamiliar_scary": {
+      "type": "followup_question",
+      "text": "Does your child **look at you** when he/she is faced with something unfamiliar or a little scary?",
+      "options": {
+        "Yes": {
+          "result_score": 0
+        },
+        "No": {
+          "result_score": 1
+        }
+      }
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}
