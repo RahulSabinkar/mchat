@@ -3,11 +3,11 @@
 **Diana L. Robins, Ph.D.** | **Deborah Fein, Ph.D.** | **Marianne Barton, Ph.D**  
 **Acknowledgement:** We thank the M-CHAT Study Group in Spain for developing the flow chart format used in this document.  
 For more information, please see www.mchatscreen.com or contact Diana Robins at mchatscreen2009@gmail.com  
-*Note. This version contains minor changes to terminology, March 4, 2025\.*
+*Note. This version contains minor changes to terminology, March 4, 2025.*
 
 ## **Permissions for Use of the M-CHAT-R/F™**
 
-The Modified Checklist for Autism in Toddlers, Revised with Follow-Up (M-CHAT-R/F; Robins, Fein, & Barton, 2009\) is a 2-stage parent-report screening tool to assess the likelihood for autism. The M-CHAT-R/F is available for free download for clinical, research, and educational purposes. Download of the M-CHAT-R/F and related material is authorized from www.mchatscreen.com.  
+The Modified Checklist for Autism in Toddlers, Revised with Follow-Up (M-CHAT-R/F; Robins, Fein, & Barton, 2009) is a 2-stage parent-report screening tool to assess the likelihood for autism. The M-CHAT-R/F is available for free download for clinical, research, and educational purposes. Download of the M-CHAT-R/F and related material is authorized from www.mchatscreen.com.  
 The M-CHAT-R/F is a copyrighted instrument, and use of the M-CHAT-R/F must follow these guidelines:
 
 1. Reprints/reproductions of the M-CHAT-R must include the copyright at the bottom (© 2009 Robins, Fein, & Barton). No modifications can be made to items, instructions, or item order without permission from the authors.  
@@ -57,7 +57,7 @@ Please answer these questions about your child. Keep in mind how your child usua
 
 ### **Permissions for Use**
 
-The Modified Checklist for Autism in Toddlers, Revised, with Follow-Up (M-CHAT-R/F; Robins, Fein, & Barton, 2009\) is designed to accompany the M-CHAT-R. The M-CHAT-R/F may be downloaded from www.mchatscreen.com.  
+The Modified Checklist for Autism in Toddlers, Revised, with Follow-Up (M-CHAT-R/F; Robins, Fein, & Barton, 2009) is designed to accompany the M-CHAT-R. The M-CHAT-R/F may be downloaded from www.mchatscreen.com.  
 The M-CHAT-R/F is a copyrighted instrument, and use of this instrument is limited by the authors and copyright holders. The M-CHAT-R and M-CHAT-R/F may be used for clinical, research, and educational purposes. Although we are making the tool available free of charge for these uses, this is copyrighted material and it is not open source. Anyone interested in using the M-CHAT-R/F in any commercial or electronic products must contact Diana L. Robins at mchatscreen2009@gmail.com to request permission.
 
 ### **Instructions for Use**

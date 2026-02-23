@@ -23,4 +23,4 @@
 19. If something new happens, does your child look at your face to see how you feel about it? (FOR EXAMPLE, if he or she hears a strange or funny noise, or sees a new toy, will he or she look at your face?) **0 or 1**  
 20. Does your child like movement activities? (FOR EXAMPLE, being swung or bounced on your knee) **0 or 1**
 
-**Total Score: \_\_\_**
+**Total Score: ___**
