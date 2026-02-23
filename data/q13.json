@@ -5,22 +5,16 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": {
-          "result_score": 1
-        }
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "result_score": 1 }
       }
     },
     "ask_yes_followup": {
       "type": "followup_question",
       "text": "Does he/she walk without holding on to anything?",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": {
-          "result_score": 1
-        }
+        "Yes": { "result_score": 0 },
+        "No": { "result_score": 1 }
       }
     }
   },

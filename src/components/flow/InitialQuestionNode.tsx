@@ -1,4 +1,4 @@
-import type { InitialQuestionNode, ScoreResult } from '@/types';
+import type { InitialQuestionNode, FlowTarget } from '@/types';
 import type { FlowContext } from '@/utils/flow-engine';
 import { personalizeText } from '@/utils/flow-engine';
 
@@ -8,10 +8,11 @@ interface InitialQuestionNodeComponentProps {
   onNavigate: (nodeId: string) => void;
   onScore: (score: 0 | 1) => void;
   onSelectOption: (key: string, value: string) => void;
+  onComplete: () => void;
 }
 
-function isScoreResult(value: unknown): value is ScoreResult {
-  return typeof value === 'object' && value !== null && 'result_score' in value;
+function hasScoreResult(target: FlowTarget): target is { result_score: 0 | 1; next?: string } {
+  return 'result_score' in target;
 }
 
 export function InitialQuestionNodeComponent({
@@ -20,27 +21,33 @@ export function InitialQuestionNodeComponent({
   onNavigate,
   onScore,
   onSelectOption,
+  onComplete,
 }: InitialQuestionNodeComponentProps) {
   const { childName } = context;
   const currentNodeId = context.state.currentNodeId;
   const selectedOption = context.state.selectedOptions[currentNodeId] as string | undefined;
 
-  const handleSelect = (optionKey: string) => {
+  const handleSelect = (optionKey: 'Yes' | 'No') => {
     onSelectOption(currentNodeId, optionKey);
     const result = node.options[optionKey];
     
-    if (typeof result === 'string') {
-      onNavigate(result);
-    } else if (isScoreResult(result)) {
-      if (result.next) {
+    if (hasScoreResult(result)) {
+      onScore(result.result_score);
+      if (result.next && result.next !== 'end') {
         onNavigate(result.next);
       } else {
-        onScore(result.result_score);
+        onComplete();
+      }
+    } else {
+      if (result.next && result.next !== 'end') {
+        onNavigate(result.next);
+      } else {
+        onComplete();
       }
     }
   };
 
-  const options = Object.keys(node.options);
+  const options = Object.keys(node.options) as ('Yes' | 'No')[];
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">

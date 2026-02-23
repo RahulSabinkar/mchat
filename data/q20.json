@@ -5,18 +5,16 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_enjoy_bounced_swung",
-        "No": "ask_reaction"
+        "Yes": { "next": "ask_enjoy_bounced_swung" },
+        "No": { "next": "ask_reaction" }
       }
     },
     "ask_enjoy_bounced_swung": {
       "type": "followup_question",
       "text": "Does he/she enjoy being bounced or swung?",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": "ask_reaction"
+        "Yes": { "result_score": 0 },
+        "No": { "next": "ask_reaction" }
       }
     },
     "ask_reaction": {
@@ -39,12 +37,8 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to any specific examples (or if \"other\" is a positive response)": {
-          "result_score": 0
-        },
-        "No to all": {
-          "result_score": 1
-        }
+        "any_selected": { "result_score": 0 },
+        "none_selected": { "result_score": 1 }
       }
     }
   },

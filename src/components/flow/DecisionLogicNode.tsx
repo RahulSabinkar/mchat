@@ -8,6 +8,7 @@ interface DecisionLogicNodeComponentProps {
   context: FlowContext;
   onNavigate: (nodeId: string) => void;
   onScore: (score: 0 | 1) => void;
+  onComplete: (hearingTestResult?: string) => void;
 }
 
 export function DecisionLogicNodeComponent({
@@ -15,24 +16,29 @@ export function DecisionLogicNodeComponent({
   context,
   onNavigate,
   onScore,
+  onComplete,
 }: DecisionLogicNodeComponentProps) {
   useEffect(() => {
     const result = evaluateDecisionLogic(node, context);
     
     if (result) {
       if (isScoreResult(result) && result.result_score !== undefined) {
-        if (result.next) {
+        onScore(result.result_score);
+        if (result.next && result.next !== 'end') {
           onNavigate(result.next);
         } else {
-          onScore(result.result_score);
+          onComplete();
         }
-      } else if ('next' in result && result.next) {
+      } else if ('next' in result && result.next && result.next !== 'end') {
         onNavigate(result.next);
+      } else if ('next' in result && (result.next === 'end' || !result.next)) {
+        onComplete();
       }
     } else {
       onScore(0);
+      onComplete();
     }
-  }, [node, context, onNavigate, onScore]);
+  }, [node, context, onNavigate, onScore, onComplete]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

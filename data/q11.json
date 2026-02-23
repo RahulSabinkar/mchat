@@ -5,10 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": "ask_no_followup"
+        "Yes": { "result_score": 0 },
+        "No": { "next": "ask_no_followup" }
       }
     },
     "ask_no_followup": {
@@ -19,16 +17,16 @@
     "evaluate_behaviors": {
       "type": "checklist",
       "categories": {
-        "0_examples": {
-          "instruction": "Does your child...\n(Below are 0 examples)",
+        "pass_examples": {
+          "instruction": "Does your child...\n(Below are pass examples)",
           "items": [
             "Smile when you smile?",
             "Smile when you enter the room?",
             "Smile when you return from being away?"
           ]
         },
-        "1_examples": {
-          "instruction": "Does he/she ...\n(Below are 1 examples)",
+        "risk_examples": {
+          "instruction": "Does he/she ...\n(Below are risk examples)",
           "items": [
             "Always smile?",
             "Smile at a favorite toy or activity?",
@@ -42,27 +40,17 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes only to 0 example(s)": {
-          "result_score": 0
-        },
-        "Yes only to 1 example(s)": {
-          "result_score": 1
-        },
-        "Yes to both 0 and 1 examples": {
-          "next": "clarify_frequency"
-        }
+        "only_pass_selected": { "result_score": 0 },
+        "only_risk_selected": { "result_score": 1 },
+        "both_selected": { "next": "clarify_frequency" }
       }
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
       "options": {
-        "0 response": {
-          "result_score": 0
-        },
-        "1 response": {
-          "result_score": 1
-        }
+        "Pass response": { "result_score": 0 },
+        "Risk response": { "result_score": 1 }
       }
     }
   },

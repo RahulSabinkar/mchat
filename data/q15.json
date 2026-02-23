@@ -5,8 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": "evaluate_behaviors"
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "next": "evaluate_behaviors" }
       }
     },
     "ask_yes_followup": {
@@ -32,12 +32,9 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to two or more": {
-          "result_score": 0
-        },
-        "Yes to one or none": {
-          "result_score": 1
-        }
+        "count_threshold": { "min": 2, "max": 999, "result_score": 0 },
+        "any_selected": { "result_score": 1 },
+        "none_selected": { "result_score": 1 }
       }
     }
   },

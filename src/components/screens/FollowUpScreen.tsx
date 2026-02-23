@@ -38,7 +38,7 @@ export function FollowUpScreen() {
     const existing = followUpAnswers[currentQuestionNumber];
     return existing?.flowState || createInitialFlowState();
   });
-  const [hearingTestResult, setHearingTestResult] = useState<string | undefined>();
+  const [pendingScore, setPendingScore] = useState<0 | 1 | null>(null);
 
   const flowContext: FlowContext = useMemo(() => ({
     questionData: questionData!,
@@ -74,12 +74,18 @@ export function FollowUpScreen() {
   }, []);
 
   const handleScore = useCallback((score: 0 | 1) => {
+    // Store the score for later use when flow completes
+    setPendingScore(score);
+  }, []);
+
+  // Separate function to actually advance to next question
+  const advanceToNextQuestion = useCallback((finalScore: 0 | 1, hearingResult?: string) => {
     dispatch({
       type: 'COMPLETE_FOLLOW_UP_QUESTION',
       payload: { 
         questionNumber: currentQuestionNumber, 
-        finalScore: score,
-        hearingTestResult,
+        finalScore,
+        hearingTestResult: hearingResult,
       },
     });
 
@@ -90,15 +96,15 @@ export function FollowUpScreen() {
     } else {
       setCurrentRiskIndex(nextIndex);
       setCurrentFlowState(createInitialFlowState());
-      setHearingTestResult(undefined);
+      setPendingScore(null);
     }
-  }, [dispatch, currentQuestionNumber, currentRiskIndex, riskItems.length, hearingTestResult, navigate]);
+  }, [dispatch, currentQuestionNumber, currentRiskIndex, riskItems.length, navigate]);
 
   const handleComplete = useCallback((hearingResult?: string) => {
-    if (hearingResult) {
-      setHearingTestResult(hearingResult);
-    }
-  }, []);
+    // Use the stored pending score to advance
+    const score = pendingScore ?? 0;
+    advanceToNextQuestion(score, hearingResult);
+  }, [pendingScore, advanceToNextQuestion]);
 
   const handleBack = () => {
     if (currentRiskIndex > 0) {

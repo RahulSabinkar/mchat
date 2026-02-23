@@ -5,10 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "evaluate_triggers",
-        "No": {
-          "result_score": 0
-        }
+        "Yes": { "next": "evaluate_triggers" },
+        "No": { "result_score": 0 }
       }
     },
     "evaluate_triggers": {
@@ -32,12 +30,8 @@
     "determine_trigger_count": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to one or none": {
-          "result_score": 0
-        },
-        "Yes to two or more": {
-          "next": "ask_how_react"
-        }
+        "count_threshold": { "min": 0, "max": 1, "result_score": 0 },
+        "any_selected": { "next": "ask_how_react" }
       }
     },
     "ask_how_react": {
@@ -48,15 +42,15 @@
     "evaluate_behaviors": {
       "type": "checklist",
       "categories": {
-        "0_responses": {
-          "instruction": "Does your child...\n(Below are 0 responses)",
+        "pass_examples": {
+          "instruction": "Does your child...\n(Below are pass examples)",
           "items": [
             "Calmly cover his/her ears?",
             "Tell you that he/she does not like the noise?"
           ]
         },
-        "1_responses": {
-          "instruction": "Does your child...\n(Below are 1 responses)",
+        "risk_examples": {
+          "instruction": "Does your child...\n(Below are risk examples)",
           "items": ["Scream?", "Cry?", "Cover his/her ears while upset?"]
         }
       },
@@ -66,27 +60,17 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes only to 0 example(s)": {
-          "result_score": 0
-        },
-        "Yes only to 1 example(s)": {
-          "result_score": 1
-        },
-        "Yes to both 0 and 1 examples": {
-          "next": "clarify_frequency"
-        }
+        "only_pass_selected": { "result_score": 0 },
+        "only_risk_selected": { "result_score": 1 },
+        "both_selected": { "next": "clarify_frequency" }
       }
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
       "options": {
-        "0 response": {
-          "result_score": 0
-        },
-        "1 response": {
-          "result_score": 1
-        }
+        "Pass response": { "result_score": 0 },
+        "Risk response": { "result_score": 1 }
       }
     }
   },

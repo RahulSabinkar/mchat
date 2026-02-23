@@ -5,8 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": "evaluate_behaviors"
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "next": "evaluate_behaviors" }
       }
     },
     "ask_yes_followup": {
@@ -31,39 +31,25 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to two or more": {
-          "result_score": 0
-        },
-        "Yes only to one": {
-          "next": "check_frequency_every_day"
-        },
-        "No to all": {
-          "result_score": 1
-        }
+        "count_threshold": { "min": 2, "max": 999, "result_score": 0 },
+        "any_selected": { "next": "check_frequency_every_day" },
+        "none_selected": { "result_score": 1 }
       }
     },
     "check_frequency_every_day": {
       "type": "followup_question",
       "text": "Does your child look you in the eye every day?",
       "options": {
-        "Yes": {
-          "next": "check_frequency_5_times"
-        },
-        "No": {
-          "result_score": 1
-        }
+        "Yes": { "next": "check_frequency_5_times" },
+        "No": { "result_score": 1 }
       }
     },
     "check_frequency_5_times": {
       "type": "followup_question",
       "text": "On a day when you are together all day, does he/she look you in the eye at least 5 times?",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": {
-          "result_score": 1
-        }
+        "Yes": { "result_score": 0 },
+        "No": { "result_score": 1 }
       }
     }
   },

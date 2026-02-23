@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import type { ChecklistNode, CategoryWithInstruction } from '@/types';
+import type { ChecklistNode } from '@/types';
 import type { FlowContext } from '@/utils/flow-engine';
 import { personalizeText } from '@/utils/flow-engine';
+
+type CategoryData = { instruction?: string; items: string[] };
 
 interface ChecklistNodeComponentProps {
   node: ChecklistNode;
   context: FlowContext;
   onNavigate: (nodeId: string) => void;
   onCheckItems: (key: string, items: string[]) => void;
+  onComplete: () => void;
 }
 
 export function ChecklistNodeComponent({
@@ -15,6 +18,7 @@ export function ChecklistNodeComponent({
   context,
   onNavigate,
   onCheckItems,
+  onComplete,
 }: ChecklistNodeComponentProps) {
   const { childName } = context;
   const currentNodeId = context.state.currentNodeId;
@@ -38,8 +42,10 @@ export function ChecklistNodeComponent({
   const handleContinue = () => {
     const itemsArray = Array.from(checkedItems);
     onCheckItems(currentNodeId, itemsArray);
-    if (node.next) {
+    if (node.next && node.next !== 'end') {
       onNavigate(node.next);
+    } else {
+      onComplete();
     }
   };
 
@@ -63,18 +69,16 @@ export function ChecklistNodeComponent({
       {hasCategories ? (
         <div className="space-y-6">
           {Object.entries(categories!).map(([categoryName, categoryData]) => {
-            const items = Array.isArray(categoryData) ? categoryData : (categoryData as CategoryWithInstruction).items;
-            const categoryInstruction = !Array.isArray(categoryData) 
-              ? (categoryData as CategoryWithInstruction).instruction 
-              : null;
-            const categoryLabel = categoryName.includes('0') ? '0 Examples' : 
-                                  categoryName.includes('1') ? '1 Examples' : categoryName;
+            const items = (categoryData as CategoryData).items;
+            const categoryInstruction = (categoryData as CategoryData).instruction;
+            const categoryLabel = categoryName.includes('pass') ? 'Pass Examples' : 
+                                  categoryName.includes('risk') ? 'Risk Examples' : categoryName;
 
             return (
               <div key={categoryName} className="space-y-3">
                 <div className="flex items-center gap-2">
                   <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
-                    categoryLabel.includes('0') 
+                    categoryLabel.includes('Pass') 
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-amber-100 text-amber-700'
                   }`}>
@@ -87,7 +91,7 @@ export function ChecklistNodeComponent({
                   </p>
                 )}
                 <div className="space-y-2">
-                  {items.map((item, idx) => (
+                  {items.map((item: string, idx: number) => (
                     <label
                       key={idx}
                       className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"

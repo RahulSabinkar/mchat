@@ -47,18 +47,29 @@ export interface FollowUpFlowState {
   checkedItems: Record<string, string[]>;
 }
 
+export type FlowTarget = { next: string; result_score?: 0 | 1 } | { result_score: 0 | 1; next?: string };
+
+export interface CountThresholdCondition {
+  min?: number;
+  max?: number;
+  next?: string;
+  result_score?: 0 | 1;
+}
+
 export type FlowNode = 
   | InitialQuestionNode
   | InstructionNode
   | ChecklistNode
   | DecisionLogicNode
-  | FollowUpQuestionNode
-  | MandatoryFollowupNode
+  | FollowupQuestionNode
   | MultipleChoiceNode;
 
 export interface InitialQuestionNode {
   type: 'initial_question';
-  options: Record<string, string | ScoreResult>;
+  options: {
+    Yes: FlowTarget;
+    No: FlowTarget;
+  };
 }
 
 export interface InstructionNode {
@@ -70,56 +81,39 @@ export interface InstructionNode {
 export interface ChecklistNode {
   type: 'checklist';
   instruction?: string;
+  categories?: {
+    pass_examples?: { instruction?: string; items: string[] };
+    risk_examples?: { instruction?: string; items: string[] };
+  };
   items?: string[];
-  categories?: ChecklistCategories;
-  options?: string[];
-  next?: string;
-}
-
-export interface ChecklistCategories {
-  [categoryName: string]: string[] | CategoryWithInstruction;
-}
-
-export interface CategoryWithInstruction {
-  instruction: string;
-  items: string[];
+  options: ['Yes', 'No'];
+  next: string;
 }
 
 export interface DecisionLogicNode {
   type: 'decision_logic';
-  conditions: Record<string, ConditionResult>;
+  conditions: {
+    only_pass_selected?: FlowTarget;
+    only_risk_selected?: FlowTarget;
+    both_selected?: FlowTarget;
+    any_selected?: FlowTarget;
+    none_selected?: FlowTarget;
+    count_threshold?: CountThresholdCondition;
+  };
+  semantic_conditions?: Record<string, FlowTarget>;
 }
 
-export type ConditionResult = ScoreResult | NextNodeResult;
-
-export interface ScoreResult {
-  result_score: 0 | 1;
-  next?: string;
-}
-
-export interface NextNodeResult {
-  next: string;
-  result_score?: 0 | 1;
-}
-
-export interface FollowUpQuestionNode {
+export interface FollowupQuestionNode {
   type: 'followup_question';
   text: string;
-  options: Record<string, string | ScoreResult>;
-}
-
-export interface MandatoryFollowupNode {
-  type: 'mandatory_followup';
-  instruction?: string;
-  text: string;
-  options: Record<string, string>;
+  options: Record<string, FlowTarget>;
 }
 
 export interface MultipleChoiceNode {
   type: 'multiple_choice';
   text: string;
   options: string[];
-  next?: string;
+  next: string;
 }
 
 export interface QuestionData {

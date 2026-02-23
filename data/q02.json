@@ -12,23 +12,16 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "No to both": {
-          "result_score": 0,
-          "next": "hearing_test_check"
-        },
-        "Yes to either": {
-          "result_score": 1,
-          "next": "hearing_test_check"
-        }
+        "none_selected": { "result_score": 0, "next": "hearing_test_check" },
+        "any_selected": { "result_score": 1, "next": "hearing_test_check" }
       }
     },
     "hearing_test_check": {
-      "type": "mandatory_followup",
-      "instruction": "ALSO ASK FOR ALL CHILDREN:",
-      "text": "Has your child’s hearing been tested?",
+      "type": "followup_question",
+      "text": "Has your child's hearing been tested?",
       "options": {
-        "Yes": "hearing_test_results",
-        "No": "end"
+        "Yes": { "next": "hearing_test_results" },
+        "No": { "next": "end" }
       }
     },
     "hearing_test_results": {

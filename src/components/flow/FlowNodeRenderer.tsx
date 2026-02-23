@@ -3,8 +3,7 @@ import type {
   InstructionNode,
   ChecklistNode,
   DecisionLogicNode,
-  FollowUpQuestionNode,
-  MandatoryFollowupNode,
+  FollowupQuestionNode,
   MultipleChoiceNode,
   FlowNode
 } from '@/types';
@@ -13,7 +12,6 @@ import { InstructionNodeComponent } from './InstructionNode';
 import { ChecklistNodeComponent } from './ChecklistNode';
 import { DecisionLogicNodeComponent } from './DecisionLogicNode';
 import { FollowUpQuestionNodeComponent } from './FollowUpQuestionNode';
-import { MandatoryFollowupNodeComponent } from './MandatoryFollowupNode';
 import { MultipleChoiceNodeComponent } from './MultipleChoiceNode';
 import type { FlowContext } from '@/utils/flow-engine';
 
@@ -45,6 +43,7 @@ export function FlowNodeRenderer({
           onNavigate={onNavigate}
           onScore={onScore}
           onSelectOption={onSelectOption}
+          onComplete={onComplete}
         />
       );
     
@@ -54,6 +53,7 @@ export function FlowNodeRenderer({
           node={node as InstructionNode}
           context={context}
           onNavigate={onNavigate}
+          onComplete={onComplete}
         />
       );
     
@@ -64,6 +64,7 @@ export function FlowNodeRenderer({
           context={context}
           onNavigate={onNavigate}
           onCheckItems={onCheckItems}
+          onComplete={onComplete}
         />
       );
     
@@ -74,28 +75,19 @@ export function FlowNodeRenderer({
           context={context}
           onNavigate={onNavigate}
           onScore={onScore}
+          onComplete={onComplete}
         />
       );
     
     case 'followup_question':
       return (
         <FollowUpQuestionNodeComponent
-          node={node as FollowUpQuestionNode}
+          node={node as FollowupQuestionNode}
           context={context}
           onNavigate={onNavigate}
           onScore={onScore}
           onSelectOption={onSelectOption}
-        />
-      );
-    
-    case 'mandatory_followup':
-      return (
-        <MandatoryFollowupNodeComponent
-          node={node as MandatoryFollowupNode}
-          context={context}
-          onNavigate={onNavigate}
           onComplete={onComplete}
-          onSelectOption={onSelectOption}
         />
       );
     

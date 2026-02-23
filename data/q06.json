@@ -5,10 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": "ask_no_followup"
+        "Yes": { "result_score": 0 },
+        "No": { "next": "ask_no_followup" }
       }
     },
     "ask_no_followup": {
@@ -31,24 +29,16 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to any of the above": {
-          "next": "show_me_prompt"
-        },
-        "No to all of the above": {
-          "result_score": 1
-        }
+        "any_selected": { "next": "show_me_prompt" },
+        "none_selected": { "result_score": 1 }
       }
     },
     "show_me_prompt": {
       "type": "followup_question",
       "text": "If you said \"Show me,\" would he/she point at it?",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": {
-          "result_score": 1
-        }
+        "Yes": { "result_score": 0 },
+        "No": { "result_score": 1 }
       }
     }
   },

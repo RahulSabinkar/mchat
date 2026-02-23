@@ -5,8 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": "ask_no_followup"
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "next": "ask_no_followup" }
       }
     },
     "ask_yes_followup": {
@@ -23,44 +23,39 @@
       "type": "checklist",
       "instruction": "Does he/she ...",
       "categories": {
-        "0_examples": [
-          "Look at object?",
-          "Point to object?",
-          "Look and comment on object?",
-          "Look if you point and say \"look!\"?"
-        ],
-        "1_examples": [
-          "Ignores you?",
-          "Look around room randomly?",
-          "Look at your finger?"
-        ]
+        "pass_examples": {
+          "items": [
+            "Look at object?",
+            "Point to object?",
+            "Look and comment on object?",
+            "Look if you point and say \"look!\"?"
+          ]
+        },
+        "risk_examples": {
+          "items": [
+            "Ignores you?",
+            "Look around room randomly?",
+            "Look at your finger?"
+          ]
+        }
       },
+      "options": ["Yes", "No"],
       "next": "determine_score"
     },
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes only to 0 example(s)": {
-          "result_score": 0
-        },
-        "Yes only to 1 example(s)": {
-          "result_score": 1
-        },
-        "Yes to both 0 and 1 example(s)": {
-          "next": "clarify_frequency"
-        }
+        "only_pass_selected": { "result_score": 0 },
+        "only_risk_selected": { "result_score": 1 },
+        "both_selected": { "next": "clarify_frequency" }
       }
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
       "options": {
-        "Most often is 0 example": {
-          "result_score": 0
-        },
-        "Most often is 1 example": {
-          "result_score": 1
-        }
+        "Most often is pass example": { "result_score": 0 },
+        "Most often is risk example": { "result_score": 1 }
       }
     }
   },

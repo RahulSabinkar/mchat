@@ -5,8 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": "evaluate_behaviors"
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "next": "evaluate_behaviors" }
       }
     },
     "ask_yes_followup": {
@@ -24,41 +24,29 @@
         "An animal in the yard?"
       ],
       "options": ["Yes", "No"],
-      "next": "determine_checklist_score"
+      "next": "determine_score"
     },
-    "determine_checklist_score": {
+    "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to any": {
-          "next": "how_draw_attention"
-        },
-        "No to all of the above": {
-          "result_score": 1
-        }
+        "any_selected": { "next": "how_draw_attention" },
+        "none_selected": { "result_score": 1 }
       }
     },
     "how_draw_attention": {
       "type": "followup_question",
       "text": "How does your child draw your attention to it? Would he/she point with one finger?",
       "options": {
-        "Yes": {
-          "next": "check_intent"
-        },
-        "No": {
-          "result_score": 1
-        }
+        "Yes": { "next": "check_intent" },
+        "No": { "result_score": 1 }
       }
     },
     "check_intent": {
       "type": "followup_question",
       "text": "Is this to show their interest, not to get help?",
       "options": {
-        "Yes OR both to show interest and to get help": {
-          "result_score": 0
-        },
-        "No": {
-          "result_score": 1
-        }
+        "Yes OR both to show interest and to get help": { "result_score": 0 },
+        "No": { "result_score": 1 }
       }
     }
   },

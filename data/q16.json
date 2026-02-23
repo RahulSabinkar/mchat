@@ -5,10 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": {
-          "result_score": 0
-        },
-        "No": "ask_no_followup"
+        "Yes": { "result_score": 0 },
+        "No": { "next": "ask_no_followup" }
       }
     },
     "ask_no_followup": {
@@ -19,16 +17,16 @@
     "evaluate_behaviors": {
       "type": "checklist",
       "categories": {
-        "0_responses": {
-          "instruction": "Does your child...\n(Below are 0 responses)",
+        "pass_examples": {
+          "instruction": "Does your child...\n(Below are pass examples)",
           "items": [
             "Look toward the thing you are looking at?",
             "Point toward the thing you are looking at?",
             "Look around to see what you are looking at?"
           ]
         },
-        "1_responses": {
-          "instruction": "Does you child...\n(Below are 1 responses)",
+        "risk_examples": {
+          "instruction": "Does you child...\n(Below are risk examples)",
           "items": ["Ignore you?", "Look at your face?"]
         }
       },
@@ -38,27 +36,17 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes only to 0 example(s)": {
-          "result_score": 0
-        },
-        "Yes only to 1 example(s)": {
-          "result_score": 1
-        },
-        "Yes to both 0 and 1 examples": {
-          "next": "clarify_frequency"
-        }
+        "only_pass_selected": { "result_score": 0 },
+        "only_risk_selected": { "result_score": 1 },
+        "both_selected": { "next": "clarify_frequency" }
       }
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
       "options": {
-        "0 response": {
-          "result_score": 0
-        },
-        "1 response": {
-          "result_score": 1
-        }
+        "Pass response": { "result_score": 0 },
+        "Risk response": { "result_score": 1 }
       }
     }
   },

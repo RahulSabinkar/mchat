@@ -5,8 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_example",
-        "No": "evaluate_behaviors"
+        "Yes": { "next": "ask_yes_example" },
+        "No": { "next": "evaluate_behaviors" }
       }
     },
     "ask_yes_example": {
@@ -18,7 +18,7 @@
       "type": "checklist",
       "instruction": "Does he/she...",
       "items": [
-        "Say “Look!” or “Watch me!”?",
+        "Say \"Look!\" or \"Watch me!\"?",
         "Babble or make a noise to get you to watch what he/ she is doing?",
         "Look at you to get praise or comment?",
         "Keep looking to see if you are looking?",
@@ -30,12 +30,8 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to any": {
-          "result_score": 0
-        },
-        "Yes to none": {
-          "result_score": 1
-        }
+        "any_selected": { "result_score": 0 },
+        "none_selected": { "result_score": 1 }
       }
     }
   },

@@ -5,8 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": "evaluate_behaviors"
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "next": "evaluate_behaviors" }
       }
     },
     "ask_yes_followup": {
@@ -24,12 +24,8 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to any of the above": {
-          "result_score": 0
-        },
-        "No to all": {
-          "result_score": 1
-        }
+        "any_selected": { "result_score": 0 },
+        "none_selected": { "result_score": 1 }
       }
     }
   },

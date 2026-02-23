@@ -1,17 +1,18 @@
-import type { FollowUpQuestionNode, ScoreResult } from '@/types';
+import type { FollowupQuestionNode, FlowTarget } from '@/types';
 import type { FlowContext } from '@/utils/flow-engine';
 import { personalizeText } from '@/utils/flow-engine';
 
 interface FollowUpQuestionNodeComponentProps {
-  node: FollowUpQuestionNode;
+  node: FollowupQuestionNode;
   context: FlowContext;
   onNavigate: (nodeId: string) => void;
   onScore: (score: 0 | 1) => void;
   onSelectOption: (key: string, value: string) => void;
+  onComplete: (hearingTestResult?: string) => void;
 }
 
-function isScoreResult(value: unknown): value is ScoreResult {
-  return typeof value === 'object' && value !== null && 'result_score' in value;
+function hasScoreResult(target: FlowTarget): target is { result_score: 0 | 1; next?: string } {
+  return 'result_score' in target;
 }
 
 export function FollowUpQuestionNodeComponent({
@@ -20,6 +21,7 @@ export function FollowUpQuestionNodeComponent({
   onNavigate,
   onScore,
   onSelectOption,
+  onComplete,
 }: FollowUpQuestionNodeComponentProps) {
   const { childName } = context;
   const currentNodeId = context.state.currentNodeId;
@@ -29,13 +31,19 @@ export function FollowUpQuestionNodeComponent({
     onSelectOption(currentNodeId, optionKey);
     const result = node.options[optionKey];
     
-    if (typeof result === 'string') {
-      onNavigate(result);
-    } else if (isScoreResult(result)) {
-      if (result.next) {
-        onNavigate(result.next);
-      }
+    if (hasScoreResult(result)) {
       onScore(result.result_score);
+      if (result.next && result.next !== 'end') {
+        onNavigate(result.next);
+      } else {
+        onComplete();
+      }
+    } else {
+      if (result.next && result.next !== 'end') {
+        onNavigate(result.next);
+      } else {
+        onComplete();
+      }
     }
   };
 

@@ -5,10 +5,8 @@
     "start": {
       "type": "initial_question",
       "options": {
-        "Yes": "ask_yes_followup",
-        "No": {
-          "result_score": 0
-        }
+        "Yes": { "next": "ask_yes_followup" },
+        "No": { "result_score": 0 }
       }
     },
     "ask_yes_followup": {
@@ -19,12 +17,12 @@
     "evaluate_behaviors": {
       "type": "checklist",
       "categories": {
-        "0_examples": {
-          "instruction": "Does he/she ...\n(Below are 0 examples)",
+        "pass_examples": {
+          "instruction": "Does he/she ...\n(Below are pass examples)",
           "items": ["Look at hands?", "Move fingers when playing peek-a-boo?"]
         },
-        "1_examples": {
-          "instruction": "Does he/she...\n(Below are 1 examples)",
+        "risk_examples": {
+          "instruction": "Does he/she...\n(Below are risk examples)",
           "items": [
             "Wiggle his/her fingers near his/her eyes?",
             "Hold his/her hands up close to his/her eyes?",
@@ -40,27 +38,18 @@
     "determine_score": {
       "type": "decision_logic",
       "conditions": {
-        "Yes to any of the above without any 1 items endorsed": {
-          "result_score": 0
-        },
-        "No to all of the above (1 examples)": {
-          "result_score": 0
-        },
-        "Yes to any of the above (1 examples)": {
-          "next": "check_frequency"
-        }
+        "only_pass_selected": { "result_score": 0 },
+        "none_selected": { "result_score": 0 },
+        "only_risk_selected": { "next": "check_frequency" },
+        "both_selected": { "next": "check_frequency" }
       }
     },
     "check_frequency": {
       "type": "followup_question",
       "text": "Does this happen more than twice a week?",
       "options": {
-        "No": {
-          "result_score": 0
-        },
-        "Yes": {
-          "result_score": 1
-        }
+        "No": { "result_score": 0 },
+        "Yes": { "result_score": 1 }
       }
     }
   },
