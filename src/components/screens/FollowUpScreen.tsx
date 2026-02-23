@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout';
 import { ProgressBar } from '@/components/questions';
@@ -20,8 +20,8 @@ function createInitialFlowState(): FollowUpFlowState {
 
 export function FollowUpScreen() {
   const navigate = useNavigate();
-  const { session, dispatch } = useScreening();
-  const { followUpAnswers, childInfo } = session;
+  const { session, dispatch, resetSession } = useScreening();
+  const { followUpAnswers, childInfo, phase } = session;
   
   const riskItems = useMemo(() => getRiskItemsFromAnswers(session.initialAnswers), [session.initialAnswers]);
   
@@ -47,6 +47,20 @@ export function FollowUpScreen() {
   }), [questionData, currentFlowState, childInfo.name]);
 
   const currentNode = questionData ? getCurrentNode(flowContext) : undefined;
+
+  useEffect(() => {
+    if (phase === 'intro') {
+      navigate('/', { replace: true });
+    } else if (phase === 'initial_questions') {
+      navigate('/screen', { replace: true });
+    } else if (phase === 'results') {
+      navigate('/results', { replace: true });
+    }
+  }, [phase, navigate]);
+
+  if (phase !== 'follow_up') {
+    return null;
+  }
 
   const handleNavigate = useCallback((nodeId: string) => {
     const newState = advanceToNode(flowContext, nodeId).state;
@@ -156,8 +170,8 @@ export function FollowUpScreen() {
           onComplete={handleComplete}
         />
 
-        {riskItems.length > 1 && (
-          <div className="flex justify-center">
+        <div className="flex justify-center gap-6">
+          {riskItems.length > 1 && (
             <button
               onClick={handleBack}
               disabled={currentRiskIndex === 0}
@@ -165,8 +179,17 @@ export function FollowUpScreen() {
             >
               Go to previous follow-up
             </button>
-          </div>
-        )}
+          )}
+          <button
+            onClick={() => {
+              resetSession();
+              navigate('/');
+            }}
+            className="text-sm text-red-500 hover:text-red-700"
+          >
+            Start Over
+          </button>
+        </div>
       </div>
     </Layout>
   );

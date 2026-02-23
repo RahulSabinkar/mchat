@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout';
 import { ExportButton } from '@/components/results';
@@ -8,7 +9,21 @@ import { formatDateForDisplay, calculateAgeInMonths } from '@/utils/date-helpers
 export function ResultsScreen() {
   const navigate = useNavigate();
   const { session, resetSession } = useScreening();
-  const { childInfo, initialScore, followUpScore, followUpRequired, followUpAvailable } = session;
+  const { childInfo, initialScore, followUpScore, followUpRequired, followUpAvailable, phase } = session;
+  
+  useEffect(() => {
+    if (phase === 'intro') {
+      navigate('/', { replace: true });
+    } else if (phase === 'initial_questions') {
+      navigate('/screen', { replace: true });
+    } else if (phase === 'follow_up') {
+      navigate('/followup', { replace: true });
+    }
+  }, [phase, navigate]);
+  
+  if (phase !== 'results') {
+    return null;
+  }
   
   if (!childInfo.name || initialScore === null) {
     navigate('/');

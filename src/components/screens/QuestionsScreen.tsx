@@ -11,21 +11,40 @@ import {
 
 export function QuestionsScreen() {
   const navigate = useNavigate();
-  const { session, dispatch } = useScreening();
+  const { session, dispatch, resetSession } = useScreening();
   const { currentQuestionIndex, initialAnswers, childInfo, phase } = session;
+  
+  console.log('[QuestionsScreen] Render - phase:', phase, 'currentQuestionIndex:', currentQuestionIndex);
   
   const totalQuestions = getTotalQuestions();
   const question = getQuestionByIndex(currentQuestionIndex);
   
+  console.log('[QuestionsScreen] question:', question?.item_number, 'totalQuestions:', totalQuestions);
+  
   useEffect(() => {
-    if (phase === 'follow_up') {
+    console.log('[QuestionsScreen] useEffect - phase:', phase);
+    if (phase === 'intro') {
+      console.log('[QuestionsScreen] Navigating to /');
+      navigate('/', { replace: true });
+    } else if (phase === 'follow_up') {
+      console.log('[QuestionsScreen] Navigating to /followup');
       navigate('/followup', { replace: true });
     } else if (phase === 'results') {
+      console.log('[QuestionsScreen] Navigating to /results');
       navigate('/results', { replace: true });
+    } else if (phase === 'initial_questions' && !question) {
+      console.log('[QuestionsScreen] Invalid state - navigating to /');
+      navigate('/', { replace: true });
     }
-  }, [phase, navigate]);
+  }, [phase, question, navigate]);
+  
+  if (phase !== 'initial_questions') {
+    console.log('[QuestionsScreen] Returning null - phase is not initial_questions');
+    return null;
+  }
   
   if (!question) {
+    console.log('[QuestionsScreen] Returning null - no question found, useEffect will navigate');
     return null;
   }
   
@@ -64,13 +83,22 @@ export function QuestionsScreen() {
           answer={currentAnswer}
         />
         
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-6">
           <button
             onClick={() => dispatch({ type: 'SET_CURRENT_QUESTION', payload: currentQuestionIndex - 1 })}
             disabled={currentQuestionIndex === 0}
             className="text-sm text-slate-500 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Go to previous question
+          </button>
+          <button
+            onClick={() => {
+              resetSession();
+              navigate('/');
+            }}
+            className="text-sm text-red-500 hover:text-red-700"
+          >
+            Start Over
           </button>
         </div>
       </div>

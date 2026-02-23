@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout';
 import { useScreening } from '@/context/ScreeningContext';
@@ -7,11 +7,26 @@ import { getTodayForInput } from '@/utils/date-helpers';
 
 export function ChildInfoScreen() {
   const navigate = useNavigate();
-  const { session, dispatch } = useScreening();
+  const { session, dispatch, resetSession } = useScreening();
+  const { phase } = session;
   const [name, setName] = useState(session.childInfo.name);
   const [dateOfBirth, setDateOfBirth] = useState(session.childInfo.dateOfBirth);
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (phase === 'initial_questions') {
+      navigate('/screen', { replace: true });
+    } else if (phase === 'follow_up') {
+      navigate('/followup', { replace: true });
+    } else if (phase === 'results') {
+      navigate('/results', { replace: true });
+    }
+  }, [phase, navigate]);
+  
+  if (phase !== 'intro') {
+    return null;
+  }
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,6 +153,19 @@ export function ChildInfoScreen() {
               Continue to Questions
             </button>
           )}
+          
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                resetSession();
+                navigate('/');
+              }}
+              className="text-sm text-red-500 hover:text-red-700"
+            >
+              Start Over
+            </button>
+          </div>
         </form>
       </div>
     </Layout>

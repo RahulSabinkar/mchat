@@ -24,6 +24,7 @@ type ScreeningAction =
   | { type: 'GO_BACK' };
 
 function screeningReducer(state: ScreeningSession, action: ScreeningAction): ScreeningSession {
+  console.log('[Reducer] Action:', action.type, 'Current phase:', state.phase, 'Current index:', state.currentQuestionIndex);
   switch (action.type) {
     case 'INIT_SESSION':
       return action.payload;
@@ -33,7 +34,22 @@ function screeningReducer(state: ScreeningSession, action: ScreeningAction): Scr
     }
     
     case 'SET_PHASE': {
-      return { ...state, phase: action.payload };
+      const newPhase = action.payload;
+      const updates: Partial<ScreeningSession> = { phase: newPhase };
+      
+      if (newPhase === 'initial_questions' && state.phase === 'intro') {
+        updates.currentQuestionIndex = 0;
+        updates.initialAnswers = {};
+        updates.initialScore = null;
+        updates.followUpRequired = false;
+        updates.followUpAvailable = false;
+        updates.followUpAnswers = {};
+        updates.followUpScore = null;
+        updates.finalResult = null;
+        updates.status = 'in_progress';
+      }
+      
+      return { ...state, ...updates };
     }
     
     case 'ANSWER_QUESTION': {
@@ -157,14 +173,17 @@ const ScreeningContext = createContext<ScreeningContextType | null>(null);
 export function ScreeningProvider({ children }: { children: ReactNode }) {
   const [session, dispatch] = useReducer(screeningReducer, null, () => {
     const stored = loadSession();
+    console.log('[ScreeningProvider] Init - stored session:', stored ? { phase: stored.phase, index: stored.currentQuestionIndex, childName: stored.childInfo.name } : null);
     return stored || createNewSession();
   });
   
   useEffect(() => {
+    console.log('[ScreeningProvider] Saving session - phase:', session.phase, 'index:', session.currentQuestionIndex);
     saveSession(session);
   }, [session]);
   
   const resetSession = () => {
+    console.log('[ScreeningContext] resetSession called');
     clearSession();
     dispatch({ type: 'RESET_SESSION' });
   };
