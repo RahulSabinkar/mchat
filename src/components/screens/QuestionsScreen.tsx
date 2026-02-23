@@ -14,37 +14,26 @@ export function QuestionsScreen() {
   const { session, dispatch, resetSession } = useScreening();
   const { currentQuestionIndex, initialAnswers, childInfo, phase } = session;
   
-  console.log('[QuestionsScreen] Render - phase:', phase, 'currentQuestionIndex:', currentQuestionIndex);
-  
   const totalQuestions = getTotalQuestions();
   const question = getQuestionByIndex(currentQuestionIndex);
   
-  console.log('[QuestionsScreen] question:', question?.item_number, 'totalQuestions:', totalQuestions);
-  
   useEffect(() => {
-    console.log('[QuestionsScreen] useEffect - phase:', phase);
     if (phase === 'intro') {
-      console.log('[QuestionsScreen] Navigating to /');
       navigate('/', { replace: true });
     } else if (phase === 'follow_up') {
-      console.log('[QuestionsScreen] Navigating to /followup');
       navigate('/followup', { replace: true });
     } else if (phase === 'results') {
-      console.log('[QuestionsScreen] Navigating to /results');
       navigate('/results', { replace: true });
     } else if (phase === 'initial_questions' && !question) {
-      console.log('[QuestionsScreen] Invalid state - navigating to /');
       navigate('/', { replace: true });
     }
   }, [phase, question, navigate]);
   
   if (phase !== 'initial_questions') {
-    console.log('[QuestionsScreen] Returning null - phase is not initial_questions');
     return null;
   }
   
   if (!question) {
-    console.log('[QuestionsScreen] Returning null - no question found, useEffect will navigate');
     return null;
   }
   

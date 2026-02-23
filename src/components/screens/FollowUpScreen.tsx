@@ -48,20 +48,6 @@ export function FollowUpScreen() {
 
   const currentNode = questionData ? getCurrentNode(flowContext) : undefined;
 
-  useEffect(() => {
-    if (phase === 'intro') {
-      navigate('/', { replace: true });
-    } else if (phase === 'initial_questions') {
-      navigate('/screen', { replace: true });
-    } else if (phase === 'results') {
-      navigate('/results', { replace: true });
-    }
-  }, [phase, navigate]);
-
-  if (phase !== 'follow_up') {
-    return null;
-  }
-
   const handleNavigate = useCallback((nodeId: string) => {
     const newState = advanceToNode(flowContext, nodeId).state;
     setCurrentFlowState(newState);
@@ -88,11 +74,9 @@ export function FollowUpScreen() {
   }, []);
 
   const handleScore = useCallback((score: 0 | 1) => {
-    // Store the score for later use when flow completes
     setPendingScore(score);
   }, []);
 
-  // Separate function to actually advance to next question
   const advanceToNextQuestion = useCallback((finalScore: 0 | 1, hearingResult?: string) => {
     dispatch({
       type: 'COMPLETE_FOLLOW_UP_QUESTION',
@@ -115,12 +99,11 @@ export function FollowUpScreen() {
   }, [dispatch, currentQuestionNumber, currentRiskIndex, riskItems.length, navigate]);
 
   const handleComplete = useCallback((hearingResult?: string) => {
-    // Use the stored pending score to advance
     const score = pendingScore ?? 0;
     advanceToNextQuestion(score, hearingResult);
   }, [pendingScore, advanceToNextQuestion]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (currentRiskIndex > 0) {
       setCurrentRiskIndex(prev => prev - 1);
       const prevQuestionNumber = riskItems[currentRiskIndex - 1];
@@ -133,7 +116,26 @@ export function FollowUpScreen() {
     } else {
       navigate('/results');
     }
-  };
+  }, [currentRiskIndex, riskItems, followUpAnswers, navigate]);
+
+  const handleStartOver = useCallback(() => {
+    resetSession();
+    navigate('/');
+  }, [resetSession, navigate]);
+
+  useEffect(() => {
+    if (phase === 'intro') {
+      navigate('/', { replace: true });
+    } else if (phase === 'initial_questions') {
+      navigate('/screen', { replace: true });
+    } else if (phase === 'results') {
+      navigate('/results', { replace: true });
+    }
+  }, [phase, navigate]);
+
+  if (phase !== 'follow_up') {
+    return null;
+  }
 
   if (!questionData || !currentNode) {
     return (
@@ -181,10 +183,7 @@ export function FollowUpScreen() {
             </button>
           )}
           <button
-            onClick={() => {
-              resetSession();
-              navigate('/');
-            }}
+            onClick={handleStartOver}
             className="text-sm text-red-500 hover:text-red-700"
           >
             Start Over

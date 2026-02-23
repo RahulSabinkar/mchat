@@ -8,7 +8,7 @@ import { formatDateForDisplay, calculateAgeInMonths } from '@/utils/date-helpers
 
 export function ResultsScreen() {
   const navigate = useNavigate();
-  const { session, resetSession } = useScreening();
+  const { session, dispatch, resetSession } = useScreening();
   const { childInfo, initialScore, followUpScore, followUpRequired, followUpAvailable, phase } = session;
   
   useEffect(() => {
@@ -75,6 +75,7 @@ export function ResultsScreen() {
   };
   
   const handleProceedToFollowUp = () => {
+    dispatch({ type: 'SET_PHASE', payload: 'follow_up' });
     navigate('/followup');
   };
   
