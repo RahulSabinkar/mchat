@@ -1,9 +1,16 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CheckCircle, AlertTriangle, XCircle, Info, AlertCircle } from 'lucide-react';
 import { Layout } from '@/components/layout';
-import { ExportButton } from '@/components/results';
+import { 
+  ExportButton, 
+  ScoreBreakdownChart, 
+  ActionChecklist, 
+  QuestionsSummary, 
+  FlaggedItemsSection 
+} from '@/components/results';
 import { useScreening } from '@/context/ScreeningContext';
-import { determineFinalResult, getResultMessage } from '@/utils/scoring';
+import { determineFinalResult, getResultMessage, getRiskItemsFromAnswers } from '@/utils/scoring';
 import { formatDateForDisplay, calculateAgeInMonths } from '@/utils/date-helpers';
 
 export function ResultsScreen() {
@@ -32,6 +39,7 @@ export function ResultsScreen() {
   
   const ageInMonths = calculateAgeInMonths(childInfo.dateOfBirth);
   const result = determineFinalResult(initialScore, followUpScore, ageInMonths);
+  const flaggedItems = getRiskItemsFromAnswers(session.initialAnswers);
   
   const getCategoryColor = () => {
     switch (result.category) {
@@ -48,23 +56,138 @@ export function ResultsScreen() {
   const getCategoryIcon = () => {
     switch (result.category) {
       case 'low':
-        return (
-          <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        );
+        return <CheckCircle className="w-8 h-8 text-green-600" />;
       case 'moderate_negative':
-        return (
-          <svg className="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-        );
+        return <AlertTriangle className="w-8 h-8 text-yellow-600" />;
       case 'moderate_positive':
       case 'high':
+        return <XCircle className="w-8 h-8 text-red-600" />;
+    }
+  };
+
+  const getScoreBasedContent = () => {
+    switch (result.category) {
+      case 'low':
         return (
-          <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-          </svg>
+          <div className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-green-900">Reassurance</h4>
+                  <p className="text-sm text-green-800">
+                    Your child's screening results show low risk for autism spectrum disorder. 
+                    This is a positive result and no immediate follow-up is required.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <Info className="w-5 h-5 text-blue-600" />
+                <h4 className="font-semibold text-blue-900">Developmental Milestones</h4>
+              </div>
+              <p className="text-sm text-blue-800">
+                Continue monitoring your child's development. Key milestones to watch for 
+                include using 2-word phrases, following simple instructions, and engaging 
+                in pretend play.
+              </p>
+            </div>
+            
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <h4 className="font-semibold text-slate-900 mb-2">What to Watch For</h4>
+              <ul className="text-sm text-slate-700 space-y-1">
+                <li>• Loss of previously acquired language or social skills</li>
+                <li>• Lack of response to name by 12 months</li>
+                <li>• Limited eye contact or social smiling</li>
+                <li>• Repetitive behaviors or intense interests</li>
+              </ul>
+            </div>
+          </div>
+        );
+      
+      case 'moderate_negative':
+        return (
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-yellow-900">Follow-Up Results: Screen Negative</h4>
+                  <p className="text-sm text-yellow-800">
+                    The follow-up interview indicates your child is currently at moderate risk, 
+                    but the detailed questions suggest no immediate concern. Continued monitoring 
+                    is recommended.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">Continued Monitoring</h4>
+              <p className="text-sm text-blue-800">
+                Rescreen at future well-child visits. If you notice any changes in your child's 
+                development or have concerns, contact your healthcare provider.
+              </p>
+            </div>
+          </div>
+        );
+      
+      case 'moderate_positive':
+        return (
+          <div className="space-y-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-red-900">Concern Identified</h4>
+                  <p className="text-sm text-red-800">
+                    The screening indicates behaviors that may warrant further evaluation. 
+                    Please discuss these results with your child's healthcare provider.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <h4 className="font-semibold text-amber-900 mb-2">Referral Pathway</h4>
+              <p className="text-sm text-amber-800">
+                Your healthcare provider may recommend a referral to a developmental pediatrician, 
+                psychologist, or early intervention program for a comprehensive evaluation.
+              </p>
+            </div>
+            
+            <FlaggedItemsSection flaggedItems={flaggedItems} childName={childInfo.name} />
+          </div>
+        );
+      
+      case 'high':
+        return (
+          <div className="space-y-4">
+            <div className="bg-red-100 border-2 border-red-300 rounded-lg p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <XCircle className="w-6 h-6 text-red-700" />
+                <h4 className="font-bold text-red-900">Urgent Referral Recommended</h4>
+              </div>
+              <p className="text-sm text-red-800">
+                The screening results strongly suggest the need for immediate diagnostic 
+                evaluation. Please contact your healthcare provider as soon as possible.
+              </p>
+            </div>
+            
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <h4 className="font-semibold text-slate-900 mb-2">Early Intervention Resources</h4>
+              <ul className="text-sm text-slate-700 space-y-2">
+                <li>• Contact your state's early intervention program</li>
+                <li>• Request a developmental evaluation from your pediatrician</li>
+                <li>• Ask about local autism specialty clinics</li>
+                <li>• Begin gathering developmental history for evaluation</li>
+              </ul>
+            </div>
+            
+            <FlaggedItemsSection flaggedItems={flaggedItems} childName={childInfo.name} />
+          </div>
         );
     }
   };
@@ -91,6 +214,11 @@ export function ResultsScreen() {
           <p className="text-slate-600">
             For {childInfo.name}, screened on {formatDateForDisplay(session.createdAt)}
           </p>
+          {ageInMonths && (
+            <p className="text-sm text-slate-500">
+              Age at screening: {ageInMonths} months
+            </p>
+          )}
         </div>
         
         <div className={`rounded-xl border-2 p-6 space-y-4 ${getCategoryColor()}`}>
@@ -111,6 +239,11 @@ export function ResultsScreen() {
           </div>
         </div>
         
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Score Breakdown</h3>
+          <ScoreBreakdownChart score={initialScore} />
+        </div>
+        
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
           <h3 className="text-lg font-semibold text-slate-900">Recommendation</h3>
           <p className="text-slate-600">{result.recommendation}</p>
@@ -122,23 +255,33 @@ export function ResultsScreen() {
           )}
         </div>
         
+        <ActionChecklist category={result.category} />
+        
+        {getScoreBasedContent()}
+        
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
           <h3 className="text-lg font-semibold text-slate-900">Important Information</h3>
           <ul className="space-y-2 text-slate-600">
             <li className="flex items-start gap-2">
-              <span className="text-primary-500 mt-1">•</span>
+              <Info className="w-4 h-4 text-primary-500 mt-1 flex-shrink-0" />
               <span>This screening tool does not provide a diagnosis.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-primary-500 mt-1">•</span>
+              <Info className="w-4 h-4 text-primary-500 mt-1 flex-shrink-0" />
               <span>False positives are common. A positive screen does not mean your child has autism.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-primary-500 mt-1">•</span>
+              <Info className="w-4 h-4 text-primary-500 mt-1 flex-shrink-0" />
               <span>Please share these results with your child's healthcare provider.</span>
             </li>
           </ul>
         </div>
+        
+        <QuestionsSummary 
+          answers={session.initialAnswers} 
+          childName={childInfo.name} 
+          flaggedItems={flaggedItems}
+        />
         
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
           <h3 className="text-lg font-semibold text-slate-900">Resources</h3>
@@ -169,9 +312,7 @@ export function ResultsScreen() {
         {canDoFollowUp && (
           <div className="bg-amber-50 rounded-xl border border-amber-200 p-6 space-y-4">
             <div className="flex items-start gap-3">
-              <svg className="w-6 h-6 text-amber-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
+              <AlertTriangle className="w-6 h-6 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="space-y-2">
                 <h3 className="font-semibold text-amber-900">Optional: Follow-Up Questions</h3>
                 <p className="text-sm text-amber-800">
