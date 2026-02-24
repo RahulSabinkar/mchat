@@ -1,0 +1,120 @@
+{
+  "item_number": 12,
+  "question": "12. Does ____________ get upset by everyday noises?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": [
+        { "label": "Yes", "next": "evaluate_triggers" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" }
+      ]
+    },
+    "evaluate_triggers": {
+      "type": "checklist",
+      "instruction": "Does your child have a negative reaction to the sound of...",
+      "items": [
+        { "text": "A washing machine?" },
+        { "text": "Babies crying?" },
+        { "text": "Vacuum cleaner?" },
+        { "text": "Hairdryer?" },
+        { "text": "Traffic?" },
+        { "text": "Babies squealing or screeching?" },
+        { "text": "Loud music?" },
+        { "text": "Telephone/ doorbell ringing?" },
+        { "text": "Noisy places such as a supermarket or restaurant?" },
+        { "text": "Other (describe): ________________________________________________" }
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
+      "next": "determine_trigger_count"
+    },
+    "determine_trigger_count": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "count_threshold",
+          "min": 0,
+          "max": 1,
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [],
+          "next": "ask_how_react"
+        }
+      ]
+    },
+    "ask_how_react": {
+      "type": "instruction",
+      "text": "How does your child react to those noises? (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does your child...",
+      "categories": [
+        {
+          "id": "pass_examples",
+          "instruction": "Does your child...\n(Below are pass examples)",
+          "items": [
+            { "text": "Calmly cover his/her ears?" },
+            { "text": "Tell you that he/she does not like the noise?" }
+          ]
+        },
+        {
+          "id": "risk_examples",
+          "instruction": "Does your child...\n(Below are risk examples)",
+          "items": [
+            { "text": "Scream?" },
+            { "text": "Cry?" },
+            { "text": "Cover his/her ears while upset?" }
+          ]
+        }
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "clarify_frequency"
+        }
+      ]
+    },
+    "clarify_frequency": {
+      "type": "followup_question",
+      "text": "Which one does he/she do most often?",
+      "options": [
+        { "label": "Pass response", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "Risk response", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

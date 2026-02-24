@@ -1,0 +1,70 @@
+{
+  "item_number": 7,
+  "question": "7. * If the interviewer just asked #6, begin here: We just talked about pointing to ask for something, ASK ALL -> Does ____________ point with one finger just to show you something interesting?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "evaluate_behaviors" }
+      ]
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example something he/she might point at to show you. (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does your child sometimes want you to see something interesting such as....",
+      "items": [
+        { "text": "An airplane in the sky?" },
+        { "text": "A truck on the road?" },
+        { "text": "A bug on the ground?" },
+        { "text": "An animal in the yard?" }
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [],
+          "next": "how_draw_attention"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
+    },
+    "how_draw_attention": {
+      "type": "followup_question",
+      "text": "How does your child draw your attention to it? Would he/she point with one finger?",
+      "options": [
+        { "label": "Yes", "next": "check_intent" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
+    },
+    "check_intent": {
+      "type": "followup_question",
+      "text": "Is this to show their interest, not to get help?",
+      "options": [
+        { "label": "Yes OR both to show interest and to get help", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

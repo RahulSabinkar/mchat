@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { ChecklistNode } from '@/types';
 import type { FlowContext } from '@/utils/flow-engine';
 import { personalizeText } from '@/utils/flow-engine';
+import { formatBoldText } from '@/utils/text-helpers';
 
 type CategoryData = { instruction?: string; items: string[] };
 
@@ -125,12 +126,9 @@ export function ChecklistNodeComponent({
                 onChange={() => toggleItem(item)}
                 className="mt-1 h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
               />
-              <span className="text-slate-700 leading-relaxed" 
-                dangerouslySetInnerHTML={{ 
-                  __html: personalizeText(item, childName)
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                }}
-              />
+              <span className="text-slate-700 leading-relaxed">
+                {formatBoldText(personalizeText(item, childName))}
+              </span>
             </label>
           ))}
         </div>

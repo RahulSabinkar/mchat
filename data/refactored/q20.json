@@ -1,0 +1,62 @@
+{
+  "item_number": 20,
+  "question": "20. Does ____________ like movement activities?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": [
+        { "label": "Yes", "next": "ask_enjoy_bounced_swung" },
+        { "label": "No", "next": "ask_reaction" }
+      ]
+    },
+    "ask_enjoy_bounced_swung": {
+      "type": "followup_question",
+      "text": "Does he/she enjoy being bounced or swung?",
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_reaction" }
+      ]
+    },
+    "ask_reaction": {
+      "type": "instruction",
+      "text": "When you swing or bounce him/her, how does he/she react? (If parent does not give an example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does your child...",
+      "items": [
+        { "text": "Laugh or smile?" },
+        { "text": "Talk or babble?" },
+        { "text": "Request more by holding out his/her arms?" },
+        { "text": "Other (describe): ________________________________________________" }
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

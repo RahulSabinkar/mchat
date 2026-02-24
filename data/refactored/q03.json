@@ -1,0 +1,61 @@
+{
+  "item_number": 3,
+  "question": "3. Does ____________ play pretend or make-believe?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "evaluate_behaviors" }
+      ]
+    },
+    "ask_yes_followup": {
+      "type": "instruction",
+      "text": "Please give me an example of his/her pretend play. (If parent does not give a 0 example below, ask each individually.)",
+      "next": "evaluate_behaviors"
+    },
+    "evaluate_behaviors": {
+      "type": "checklist",
+      "instruction": "Does he/she usually...",
+      "items": [
+        { "text": "Pretend to drink from a **toy** cup?" },
+        { "text": "Pretend to eat from a **toy** spoon or fork?" },
+        { "text": "Pretend to talk on the telephone?" },
+        { "text": "Pretend to feed a doll or stuffed animal with real or imaginary food?" },
+        { "text": "Push a car as if it is going along a pretend road?" },
+        { "text": "Pretend to be a robot, an airplane, a ballerina, or any other favorite character?" },
+        { "text": "Put a toy pot on a pretend stove?" },
+        { "text": "Stir imaginary food?" },
+        { "text": "Put an action figure or doll into a car or truck as if it is the driver or 0enger?" },
+        { "text": "Pretend to vacuum the rug, sweep the floor, or the mow lawn?" },
+        { "text": "Other (describe) ________________________________________________" }
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
+      "next": "determine_score"
+    },
+    "determine_score": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}

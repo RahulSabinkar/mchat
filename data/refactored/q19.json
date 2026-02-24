@@ -1,0 +1,41 @@
+{
+  "item_number": 19,
+  "question": "19. If something new happens, does ____________ look at your face to see how you feel about it?",
+  "flow": {
+    "start": {
+      "type": "initial_question",
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_strange_noise" }
+      ]
+    },
+    "ask_strange_noise": {
+      "type": "followup_question",
+      "text": "If your child hears a strange or scary noise, will he/she look at you **before** responding?",
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_someone_new" }
+      ]
+    },
+    "ask_someone_new": {
+      "type": "followup_question",
+      "text": "Does your child **look at you** when someone new approaches?",
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_unfamiliar_scary" }
+      ]
+    },
+    "ask_unfamiliar_scary": {
+      "type": "followup_question",
+      "text": "Does your child **look at you** when he/she is faced with something unfamiliar or a little scary?",
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
+    }
+  },
+  "metadata": {
+    "copyright": "©2009 Diana Robins, Deborah Fein, & Marianne Barton",
+    "version": "Terminology Update March 2025"
+  }
+}
