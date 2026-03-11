@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_example" },
-        "No": { "next": "ask_situation_clue" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_example" },
+        { "label": "No", "next": "ask_situation_clue" }
+      ]
     },
     "ask_yes_example": {
       "type": "instruction",
@@ -15,46 +15,70 @@
       "next": "evaluate_yes_example"
     },
     "evaluate_yes_example": {
-      "type": "decision_logic",
-      "conditions": {},
-      "semantic_conditions": {
-        "If example indicates that child can understand a simple command without nonverbal cues": { "result_score": 0 },
-        "If example does not indicate that child can understand a simple command without nonverbal cues": { "next": "ask_situation_clue" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "semantic_evaluation",
+          "expression": "example_indicates_understanding_without_nonverbal_cues",
+          "description": "If example indicates that child can understand a simple command without nonverbal cues",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "semantic_evaluation",
+          "expression": "example_does_not_indicate_understanding_without_nonverbal_cues",
+          "description": "If example does not indicate that child can understand a simple command without nonverbal cues",
+          "actions": [],
+          "next": "ask_situation_clue"
+        }
+      ]
     },
     "ask_situation_clue": {
       "type": "followup_question",
       "text": "When the situation gives him/her a clue, can he/she follow a command? For example when you are dressed to go out and you tell him/her to get his/her shoes, does he/she understand?",
-      "options": {
-        "Yes": { "next": "evaluate_no_clue_checklist" },
-        "No": { "next": "ask_dinnertime_clue" }
-      }
+      "options": [
+        { "label": "Yes", "next": "evaluate_no_clue_checklist" },
+        { "label": "No", "next": "ask_dinnertime_clue" }
+      ]
     },
     "ask_dinnertime_clue": {
       "type": "followup_question",
       "text": "If it is dinnertime and food is on the table, and you tell the child to sit down, will he/she come sit at the table?",
-      "options": {
-        "Yes": { "next": "evaluate_no_clue_checklist" },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes", "next": "evaluate_no_clue_checklist" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     },
     "evaluate_no_clue_checklist": {
       "type": "checklist",
       "instruction": "When the situation does not give any clues, can he/she follow a command? For example... (ask until you get a yes or use all examples)",
       "items": [
-        "(1) If you say, \"Show me your shoe\" without pointing, making gestures, or giving hints (when you are not going out or getting dressed), does your child show you his/her shoe?",
-        "(2) If you say, \"Bring me the blanket\" or ask for another object without pointing, making gestures, or giving hints, does your child bring it to you?",
-        "(3) If you say, \"Put the book on the chair\" without pointing, making gestures, or giving any other hints , does your child put the book on the chair?"
+        { "text": "(1) If you say, \"Show me your shoe\" without pointing, making gestures, or giving hints (when you are not going out or getting dressed), does your child show you his/her shoe?" },
+        { "text": "(2) If you say, \"Bring me the blanket\" or ask for another object without pointing, making gestures, or giving hints, does your child bring it to you?" },
+        { "text": "(3) If you say, \"Put the book on the chair\" without pointing, making gestures, or giving any other hints , does your child put the book on the chair?" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "any_selected": { "result_score": 0 },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     }
   },
   "metadata": {

@@ -2,9 +2,10 @@ import type {
   FlowNode, 
   QuestionData, 
   FollowUpFlowState,
-  DecisionLogicNode,
-  FlowTarget,
-  ChecklistNode
+  TransientLogicNode,
+  FlowAction,
+  FlowCondition,
+  ChecklistCategory
 } from '@/types';
 
 export interface FlowContext {
@@ -19,6 +20,11 @@ export interface FlowResult {
   nextNodeId?: string;
   state: FollowUpFlowState;
   hearingTestResult?: string;
+}
+
+export interface EvaluationResult {
+  next?: string;
+  actions: FlowAction[];
 }
 
 export function getCurrentNode(context: FlowContext): FlowNode | undefined {
@@ -70,102 +76,125 @@ export function setCheckedItems(
   };
 }
 
-export function evaluateDecisionLogic(
-  node: DecisionLogicNode,
+export function evaluateTransientLogic(
+  node: TransientLogicNode,
   context: FlowContext
-): FlowTarget | null {
-  const { conditions, semantic_conditions } = node;
-  const { checkedItems, selectedOptions } = context.state;
+): EvaluationResult | null {
+  const { conditions } = node;
+  const { checkedItems } = context.state;
   const currentNodeId = context.state.currentNodeId;
   const currentChecked = checkedItems[currentNodeId] || [];
 
-  const passItems = getItemsForCategory(context.questionData, currentNodeId, 'pass_examples') || [];
-  const riskItems = getItemsForCategory(context.questionData, currentNodeId, 'risk_examples') || [];
+  const passItems = getItemsForCategory(context.questionData, currentNodeId, 'pass_examples');
+  const riskItems = getItemsForCategory(context.questionData, currentNodeId, 'risk_examples');
 
   const hasPass = passItems.some(item => currentChecked.includes(item));
   const hasRisk = riskItems.some(item => currentChecked.includes(item));
   const count = currentChecked.length;
 
-  if (conditions.both_selected && hasPass && hasRisk) {
-    return conditions.both_selected;
-  }
-  
-  if (conditions.only_pass_selected && hasPass && !hasRisk) {
-    return conditions.only_pass_selected;
-  }
-  
-  if (conditions.only_risk_selected && hasRisk && !hasPass) {
-    return conditions.only_risk_selected;
-  }
-  
-  if (conditions.count_threshold) {
-    const threshold = conditions.count_threshold;
-    const min = threshold.min ?? 0;
-    const max = threshold.max ?? Infinity;
-    if (count >= min && count <= max) {
-      const { min: _, max: __, ...target } = threshold;
-      return target as FlowTarget;
-    }
-  }
-  
-  if (conditions.any_selected && count > 0) {
-    return conditions.any_selected;
-  }
-  
-  if (conditions.none_selected && count === 0) {
-    return conditions.none_selected;
-  }
-
-  if (semantic_conditions) {
-    for (const [conditionText, result] of Object.entries(semantic_conditions)) {
-      if (evaluateSemanticCondition(conditionText, selectedOptions, currentChecked, currentNodeId)) {
-        return result;
-      }
+  for (const condition of conditions) {
+    if (evaluateCondition(condition, { hasPass, hasRisk, count, currentChecked, checkedItems, currentNodeId })) {
+      return {
+        next: condition.next,
+        actions: condition.actions || [],
+      };
     }
   }
 
   return null;
 }
 
-function evaluateSemanticCondition(
-  conditionText: string,
-  selectedOptions: Record<string, string | string[]>,
-  currentChecked: string[],
-  currentNodeId: string
-): boolean {
-  const lowerCondition = conditionText.toLowerCase();
+interface ConditionContext {
+  hasPass: boolean;
+  hasRisk: boolean;
+  count: number;
+  currentChecked: string[];
+  checkedItems: Record<string, string[]>;
+  currentNodeId: string;
+}
 
-  if (lowerCondition.includes('example indicates that child can understand')) {
-    return currentChecked.some(item => 
-      item.toLowerCase().includes('shoe') ||
-      item.toLowerCase().includes('blanket') ||
-      item.toLowerCase().includes('book') ||
-      item.toLowerCase().includes('command') ||
-      item.toLowerCase().includes('understand')
-    );
+function evaluateCondition(condition: FlowCondition, ctx: ConditionContext): boolean {
+  const { type, expression } = condition;
+
+  if (type === 'always') {
+    return true;
   }
 
-  if (lowerCondition.includes('example does not indicate that child can understand')) {
-    return !currentChecked.some(item => 
-      item.toLowerCase().includes('shoe') ||
-      item.toLowerCase().includes('blanket') ||
-      item.toLowerCase().includes('book') ||
-      item.toLowerCase().includes('command') ||
-      item.toLowerCase().includes('understand')
-    );
+  if (type === 'fallback') {
+    return true;
   }
 
-  if (selectedOptions[currentNodeId]) {
-    const selectedValue = selectedOptions[currentNodeId];
-    if (typeof selectedValue === 'string') {
-      return conditionText.includes(selectedValue) || selectedValue.includes(conditionText);
+  if (type === 'count_threshold') {
+    const min = condition.min ?? 0;
+    const max = condition.max ?? Infinity;
+    return ctx.count >= min && ctx.count <= max;
+  }
+
+  if (type === 'category_selection') {
+    switch (expression) {
+      case 'both_selected':
+        return ctx.hasPass && ctx.hasRisk;
+      case 'only_pass_selected':
+        return ctx.hasPass && !ctx.hasRisk;
+      case 'only_risk_selected':
+        return ctx.hasRisk && !ctx.hasPass;
+      case 'any_selected':
+        return ctx.count > 0;
+      case 'none_selected':
+        return ctx.count === 0;
+      default:
+        return false;
+    }
+  }
+
+  if (type === 'selection_count') {
+    switch (expression) {
+      case 'any_selected':
+        return ctx.count > 0;
+      case 'none_selected':
+        return ctx.count === 0;
+      default:
+        break;
+    }
+    
+    const match = expression?.match(/^count(?:_(\d+))?(?:_(\d+))?$/);
+    if (match) {
+      const min = match[1] ? parseInt(match[1], 10) : 0;
+      const max = match[2] ? parseInt(match[2], 10) : Infinity;
+      return ctx.count >= min && ctx.count <= max;
+    }
+    
+    const rangeMatch = expression?.match(/^(gte|gt|lte|lt|eq)_(\d+)$/);
+    if (rangeMatch) {
+      const [, op, valStr] = rangeMatch;
+      const val = parseInt(valStr, 10);
+      switch (op) {
+        case 'gte': return ctx.count >= val;
+        case 'gt': return ctx.count > val;
+        case 'lte': return ctx.count <= val;
+        case 'lt': return ctx.count < val;
+        case 'eq': return ctx.count === val;
+        default: return false;
+      }
     }
   }
 
   return false;
 }
 
-function getCategories(questionData: QuestionData, nodeId: string): ChecklistNode['categories'] | undefined {
+export function executeActions(actions: FlowAction[]): { score?: 0 | 1 } {
+  let score: 0 | 1 | undefined;
+  
+  for (const action of actions) {
+    if (action.type === 'set_score' && action.value !== undefined) {
+      score = action.value as 0 | 1;
+    }
+  }
+  
+  return { score };
+}
+
+function getCategories(questionData: QuestionData, nodeId: string): ChecklistCategory[] | undefined {
   const node = questionData.flow[nodeId];
   if (node?.type === 'checklist' && 'categories' in node) {
     return node.categories;
@@ -176,19 +205,24 @@ function getCategories(questionData: QuestionData, nodeId: string): ChecklistNod
 function getItemsForCategory(
   questionData: QuestionData, 
   nodeId: string, 
-  categoryName: string
-): string[] | undefined {
+  categoryId: string
+): string[] {
   const categories = getCategories(questionData, nodeId);
-  if (!categories) return undefined;
+  if (!categories) return [];
 
-  const category = categories[categoryName as keyof typeof categories];
-  if (!category) return undefined;
+  const category = categories.find(c => c.id === categoryId);
+  if (!category) return [];
 
-  return category.items;
+  return category.items.map(item => item.text);
 }
 
-export function isScoreResult(target: FlowTarget): target is { result_score: 0 | 1 } {
-  return 'result_score' in target;
+export function hasSetScoreAction(actions: FlowAction[]): boolean {
+  return actions.some(action => action.type === 'set_score');
+}
+
+export function getScoreFromActions(actions: FlowAction[]): 0 | 1 | undefined {
+  const setScoreAction = actions.find(action => action.type === 'set_score');
+  return setScoreAction?.value as 0 | 1 | undefined;
 }
 
 export function getFlowProgress(context: FlowContext): { current: number; total: number } {

@@ -63,14 +63,18 @@ export function FollowUpScreen() {
     }));
   }, []);
 
-  const handleCheckItems = useCallback((key: string, items: string[]) => {
-    setCurrentFlowState(prev => ({
-      ...prev,
-      checkedItems: {
-        ...prev.checkedItems,
-        [key]: items,
-      },
-    }));
+  const handleNavigateWithItems = useCallback((nodeId: string, key: string, items: string[]) => {
+    setCurrentFlowState(prev => {
+      const newState = {
+        ...prev,
+        checkedItems: {
+          ...prev.checkedItems,
+          [key]: items,
+        },
+        currentNodeId: nodeId,
+      };
+      return newState;
+    });
   }, []);
 
   const handleScore = useCallback((score: 0 | 1) => {
@@ -168,7 +172,7 @@ export function FollowUpScreen() {
           onNavigate={handleNavigate}
           onScore={handleScore}
           onSelectOption={handleSelectOption}
-          onCheckItems={handleCheckItems}
+          onNavigateWithItems={handleNavigateWithItems}
           onComplete={handleComplete}
         />
 

@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "result_score": 0 },
-        "No": { "next": "ask_no_followup" }
-      }
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_no_followup" }
+      ]
     },
     "ask_no_followup": {
       "type": "instruction",
@@ -16,38 +16,62 @@
     },
     "evaluate_behaviors": {
       "type": "checklist",
-      "categories": {
-        "pass_examples": {
+      "instruction": "Does your child...",
+      "categories": [
+        {
+          "id": "pass_examples",
           "instruction": "Does your child...\n(Below are pass examples)",
           "items": [
-            "Look toward the thing you are looking at?",
-            "Point toward the thing you are looking at?",
-            "Look around to see what you are looking at?"
+            { "text": "Look toward the thing you are looking at?" },
+            { "text": "Point toward the thing you are looking at?" },
+            { "text": "Look around to see what you are looking at?" }
           ]
         },
-        "risk_examples": {
+        {
+          "id": "risk_examples",
           "instruction": "Does you child...\n(Below are risk examples)",
-          "items": ["Ignore you?", "Look at your face?"]
+          "items": [
+            { "text": "Ignore you?" },
+            { "text": "Look at your face?" }
+          ]
         }
-      },
-      "options": ["Yes", "No"],
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "only_pass_selected": { "result_score": 0 },
-        "only_risk_selected": { "result_score": 1 },
-        "both_selected": { "next": "clarify_frequency" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "clarify_frequency"
+        }
+      ]
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
-      "options": {
-        "Pass response": { "result_score": 0 },
-        "Risk response": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Pass response", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "Risk response", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

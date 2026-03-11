@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "result_score": 0 }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" }
+      ]
     },
     "ask_yes_followup": {
       "type": "instruction",
@@ -16,41 +16,70 @@
     },
     "evaluate_behaviors": {
       "type": "checklist",
-      "categories": {
-        "pass_examples": {
+      "instruction": "Does he/she...",
+      "categories": [
+        {
+          "id": "pass_examples",
           "instruction": "Does he/she ...\n(Below are pass examples)",
-          "items": ["Look at hands?", "Move fingers when playing peek-a-boo?"]
+          "items": [
+            { "text": "Look at hands?" },
+            { "text": "Move fingers when playing peek-a-boo?" }
+          ]
         },
-        "risk_examples": {
+        {
+          "id": "risk_examples",
           "instruction": "Does he/she...\n(Below are risk examples)",
           "items": [
-            "Wiggle his/her fingers near his/her eyes?",
-            "Hold his/her hands up close to his/her eyes?",
-            "Hold his/her hands off to the side of his/her eyes?",
-            "Flap his/her hands near his/her face?",
-            "Other (describe) ________________________________________________"
+            { "text": "Wiggle his/her fingers near his/her eyes?" },
+            { "text": "Hold his/her hands up close to his/her eyes?" },
+            { "text": "Hold his/her hands off to the side of his/her eyes?" },
+            { "text": "Flap his/her hands near his/her face?" },
+            { "text": "Other (describe) ________________________________________________" }
           ]
         }
-      },
-      "options": ["Yes", "No"],
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "only_pass_selected": { "result_score": 0 },
-        "none_selected": { "result_score": 0 },
-        "only_risk_selected": { "next": "check_frequency" },
-        "both_selected": { "next": "check_frequency" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [],
+          "next": "check_frequency"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "check_frequency"
+        }
+      ]
     },
     "check_frequency": {
       "type": "followup_question",
       "text": "Does this happen more than twice a week?",
-      "options": {
-        "No": { "result_score": 0 },
-        "Yes": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "No", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

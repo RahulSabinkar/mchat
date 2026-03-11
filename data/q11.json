@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "result_score": 0 },
-        "No": { "next": "ask_no_followup" }
-      }
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_no_followup" }
+      ]
     },
     "ask_no_followup": {
       "type": "instruction",
@@ -16,42 +16,63 @@
     },
     "evaluate_behaviors": {
       "type": "checklist",
-      "categories": {
-        "pass_examples": {
+      "instruction": "Does your child...",
+      "categories": [
+        {
+          "id": "pass_examples",
           "instruction": "Does your child...\n(Below are pass examples)",
           "items": [
-            "Smile when you smile?",
-            "Smile when you enter the room?",
-            "Smile when you return from being away?"
+            { "text": "Smile when you smile?" },
+            { "text": "Smile when you enter the room?" },
+            { "text": "Smile when you return from being away?" }
           ]
         },
-        "risk_examples": {
+        {
+          "id": "risk_examples",
           "instruction": "Does he/she ...\n(Below are risk examples)",
           "items": [
-            "Always smile?",
-            "Smile at a favorite toy or activity?",
-            "Smile randomly or at nothing in particular?"
+            { "text": "Always smile?" },
+            { "text": "Smile at a favorite toy or activity?" },
+            { "text": "Smile randomly or at nothing in particular?" }
           ]
         }
-      },
-      "options": ["Yes", "No"],
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "only_pass_selected": { "result_score": 0 },
-        "only_risk_selected": { "result_score": 1 },
-        "both_selected": { "next": "clarify_frequency" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "clarify_frequency"
+        }
+      ]
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
-      "options": {
-        "Pass response": { "result_score": 0 },
-        "Risk response": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Pass response", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "Risk response", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

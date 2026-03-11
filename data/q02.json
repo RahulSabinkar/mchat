@@ -3,36 +3,59 @@
   "question": "2. You reported that you have wondered if you child is deaf. What led you to wonder that?",
   "flow": {
     "start": {
-      "type": "checklist",
-      "instruction": "Does he/she...",
-      "items": ["often ignore sounds?", "often ignore people?"],
-      "options": ["Yes", "No"],
-      "next": "determine_score"
+      "type": "initial_question",
+      "options": [
+        { "label": "often ignore sounds?", "next": "determine_score_ignore_sounds" },
+        { "label": "often ignore people?", "next": "determine_score_ignore_people" },
+        { "label": "Other", "next": "determine_score_other" }
+      ]
     },
-    "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "none_selected": { "result_score": 0, "next": "hearing_test_check" },
-        "any_selected": { "result_score": 1, "next": "hearing_test_check" }
-      }
+    "determine_score_ignore_sounds": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "always",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "hearing_test_check"
+        }
+      ]
+    },
+    "determine_score_ignore_people": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "always",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "hearing_test_check"
+        }
+      ]
+    },
+    "determine_score_other": {
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "always",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "hearing_test_check"
+        }
+      ]
     },
     "hearing_test_check": {
       "type": "followup_question",
       "text": "Has your child's hearing been tested?",
-      "options": {
-        "Yes": { "next": "hearing_test_results" },
-        "No": { "next": "end" }
-      }
+      "options": [
+        { "label": "Yes", "next": "hearing_test_results" },
+        { "label": "No", "actions": [], "next": "completed" }
+      ]
     },
     "hearing_test_results": {
       "type": "multiple_choice",
       "text": "What were the results of the hearing test? (choose one):",
       "options": [
-        "Hearing in normal range",
-        "Hearing below normal",
-        "Results inconclusive or not definitive"
-      ],
-      "next": "end"
+        { "label": "Hearing in normal range", "actions": [], "next": "completed" },
+        { "label": "Hearing below normal", "actions": [], "next": "completed" },
+        { "label": "Results inconclusive or not definitive", "actions": [], "next": "completed" }
+      ]
     }
   },
   "metadata": {

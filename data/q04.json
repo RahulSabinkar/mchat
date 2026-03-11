@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "next": "evaluate_behaviors" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "evaluate_behaviors" }
+      ]
     },
     "ask_yes_followup": {
       "type": "instruction",
@@ -17,16 +17,34 @@
     "evaluate_behaviors": {
       "type": "checklist",
       "instruction": "Does he/she enjoy climbing on...",
-      "items": ["Stairs?", "Chairs?", "Furniture?", "Playground equipment?"],
-      "options": ["Yes", "No"],
+      "items": [
+        { "text": "Stairs?" },
+        { "text": "Chairs?" },
+        { "text": "Furniture?" },
+        { "text": "Playground equipment?" }
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "any_selected": { "result_score": 0 },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     }
   },
   "metadata": {

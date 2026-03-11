@@ -4,18 +4,18 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_enjoy_bounced_swung" },
-        "No": { "next": "ask_reaction" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_enjoy_bounced_swung" },
+        { "label": "No", "next": "ask_reaction" }
+      ]
     },
     "ask_enjoy_bounced_swung": {
       "type": "followup_question",
       "text": "Does he/she enjoy being bounced or swung?",
-      "options": {
-        "Yes": { "result_score": 0 },
-        "No": { "next": "ask_reaction" }
-      }
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "ask_reaction" }
+      ]
     },
     "ask_reaction": {
       "type": "instruction",
@@ -26,20 +26,33 @@
       "type": "checklist",
       "instruction": "Does your child...",
       "items": [
-        "Laugh or smile?",
-        "Talk or babble?",
-        "Request more by holding out his/her arms?",
-        "Other (describe): ________________________________________________"
+        { "text": "Laugh or smile?" },
+        { "text": "Talk or babble?" },
+        { "text": "Request more by holding out his/her arms?" },
+        { "text": "Other (describe): ________________________________________________" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "any_selected": { "result_score": 0 },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     }
   },
   "metadata": {

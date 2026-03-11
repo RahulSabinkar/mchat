@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "next": "ask_no_followup" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "ask_no_followup" }
+      ]
     },
     "ask_yes_followup": {
       "type": "instruction",
@@ -21,39 +21,69 @@
     },
     "evaluate_behaviors": {
       "type": "checklist",
-      "categories": {
-        "pass_examples": {
+      "instruction": "Does he/she...",
+      "categories": [
+        {
+          "id": "pass_examples",
           "instruction": "Does he/she...\n(below are pass examples)",
-          "items": ["Look up?", "Talk or babble?", "Stop what he/she is doing?"]
+          "items": [
+            { "text": "Look up?" },
+            { "text": "Talk or babble?" },
+            { "text": "Stop what he/she is doing?" }
+          ]
         },
-        "risk_examples": {
+        {
+          "id": "risk_examples",
           "instruction": "Does he/she...\n(below are risk examples)",
           "items": [
-            "Make no response?",
-            "Seem to hear but ignores parent?",
-            "Respond only if parent is right in front of the child's face?",
-            "Respond only if touched?"
+            { "text": "Make no response?" },
+            { "text": "Seem to hear but ignores parent?" },
+            { "text": "Respond only if parent is right in front of the child's face?" },
+            { "text": "Respond only if touched?" }
           ]
         }
-      },
-      "options": ["Yes", "No"],
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "only_pass_selected": { "result_score": 0 },
-        "only_risk_selected": { "result_score": 1 },
-        "both_selected": { "next": "clarify_frequency" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "clarify_frequency"
+        },
+        {
+          "type": "fallback",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        }
+      ]
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
-      "options": {
-        "Pass response": { "result_score": 0 },
-        "Risk response": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Pass response", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "Risk response", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

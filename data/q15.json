@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "next": "evaluate_behaviors" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "evaluate_behaviors" }
+      ]
     },
     "ask_yes_followup": {
       "type": "instruction",
@@ -18,24 +18,43 @@
       "type": "checklist",
       "instruction": "Does your child try to copy you if you...",
       "items": [
-        "Stick out your tongue?",
-        "Make a funny sound?",
-        "Wave good bye?",
-        "Clap your hands?",
-        "Put your fingers to your lips to signal \"Shhh\"?",
-        "Blow a kiss?",
-        "Other (describe): ________________________________________________"
+        { "text": "Stick out your tongue?" },
+        { "text": "Make a funny sound?" },
+        { "text": "Wave good bye?" },
+        { "text": "Clap your hands?" },
+        { "text": "Put your fingers to your lips to signal \"Shhh\"?" },
+        { "text": "Blow a kiss?" },
+        { "text": "Other (describe): ________________________________________________" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "count_threshold": { "min": 2, "max": 999, "result_score": 0 },
-        "any_selected": { "result_score": 1 },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "count_threshold",
+          "min": 2,
+          "max": 999,
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     }
   },
   "metadata": {

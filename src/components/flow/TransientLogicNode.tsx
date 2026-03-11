@@ -1,37 +1,36 @@
 import { useEffect } from 'react';
-import type { DecisionLogicNode } from '@/types';
+import type { TransientLogicNode } from '@/types';
 import type { FlowContext } from '@/utils/flow-engine';
-import { evaluateDecisionLogic, isScoreResult } from '@/utils/flow-engine';
+import { evaluateTransientLogic, executeActions } from '@/utils/flow-engine';
 
-interface DecisionLogicNodeComponentProps {
-  node: DecisionLogicNode;
+interface TransientLogicNodeComponentProps {
+  node: TransientLogicNode;
   context: FlowContext;
   onNavigate: (nodeId: string) => void;
   onScore: (score: 0 | 1) => void;
   onComplete: (hearingTestResult?: string) => void;
 }
 
-export function DecisionLogicNodeComponent({
+export function TransientLogicNodeComponent({
   node,
   context,
   onNavigate,
   onScore,
   onComplete,
-}: DecisionLogicNodeComponentProps) {
+}: TransientLogicNodeComponentProps) {
   useEffect(() => {
-    const result = evaluateDecisionLogic(node, context);
+    const result = evaluateTransientLogic(node, context);
     
     if (result) {
-      if (isScoreResult(result) && result.result_score !== undefined) {
-        onScore(result.result_score);
-        if (result.next && result.next !== 'end') {
-          onNavigate(result.next);
-        } else {
-          onComplete();
-        }
-      } else if ('next' in result && result.next && result.next !== 'end') {
+      const { score } = executeActions(result.actions);
+      
+      if (score !== undefined) {
+        onScore(score);
+      }
+      
+      if (result.next && result.next !== 'completed') {
         onNavigate(result.next);
-      } else if ('next' in result && (result.next === 'end' || !result.next)) {
+      } else {
         onComplete();
       }
     } else {

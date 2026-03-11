@@ -4,18 +4,18 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     },
     "ask_yes_followup": {
       "type": "followup_question",
       "text": "Does he/she walk without holding on to anything?",
-      "options": {
-        "Yes": { "result_score": 0 },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

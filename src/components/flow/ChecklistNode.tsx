@@ -4,22 +4,16 @@ import type { FlowContext } from '@/utils/flow-engine';
 import { personalizeText } from '@/utils/flow-engine';
 import { formatBoldText } from '@/utils/text-helpers';
 
-type CategoryData = { instruction?: string; items: string[] };
-
 interface ChecklistNodeComponentProps {
   node: ChecklistNode;
   context: FlowContext;
-  onNavigate: (nodeId: string) => void;
-  onCheckItems: (key: string, items: string[]) => void;
-  onComplete: () => void;
+  onNavigateWithItems: (nodeId: string, key: string, items: string[]) => void;
 }
 
 export function ChecklistNodeComponent({
   node,
   context,
-  onNavigate,
-  onCheckItems,
-  onComplete,
+  onNavigateWithItems,
 }: ChecklistNodeComponentProps) {
   const { childName } = context;
   const currentNodeId = context.state.currentNodeId;
@@ -42,16 +36,12 @@ export function ChecklistNodeComponent({
 
   const handleContinue = () => {
     const itemsArray = Array.from(checkedItems);
-    onCheckItems(currentNodeId, itemsArray);
-    if (node.next && node.next !== 'end') {
-      onNavigate(node.next);
-    } else {
-      onComplete();
-    }
+    const nextNodeId = node.next || 'completed';
+    onNavigateWithItems(nextNodeId, currentNodeId, itemsArray);
   };
 
   const categories = node.categories;
-  const hasCategories = categories && Object.keys(categories).length > 0;
+  const hasCategories = categories && categories.length > 0;
   const simpleItems = node.items || [];
 
   return (
@@ -69,14 +59,14 @@ export function ChecklistNodeComponent({
 
       {hasCategories ? (
         <div className="space-y-6">
-          {Object.entries(categories!).map(([categoryName, categoryData]) => {
-            const items = (categoryData as CategoryData).items;
-            const categoryInstruction = (categoryData as CategoryData).instruction;
-            const categoryLabel = categoryName.includes('pass') ? 'Pass Examples' : 
-                                  categoryName.includes('risk') ? 'Risk Examples' : categoryName;
+          {categories!.map((category) => {
+            const items = category.items;
+            const categoryInstruction = category.instruction;
+            const categoryLabel = category.id === 'pass_examples' ? 'Pass Examples' : 
+                                  category.id === 'risk_examples' ? 'Risk Examples' : category.id;
 
             return (
-              <div key={categoryName} className="space-y-3">
+              <div key={category.id} className="space-y-3">
                 <div className="flex items-center gap-2">
                   <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
                     categoryLabel.includes('Pass') 
@@ -92,19 +82,19 @@ export function ChecklistNodeComponent({
                   </p>
                 )}
                 <div className="space-y-2">
-                  {items.map((item: string, idx: number) => (
+                  {items.map((item, idx) => (
                     <label
                       key={idx}
                       className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
-                        checked={checkedItems.has(item)}
-                        onChange={() => toggleItem(item)}
+                        checked={checkedItems.has(item.text)}
+                        onChange={() => toggleItem(item.text)}
                         className="mt-1 h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                       />
                       <span className="text-slate-700 leading-relaxed">
-                        {personalizeText(item, childName)}
+                        {personalizeText(item.text, childName)}
                       </span>
                     </label>
                   ))}
@@ -122,12 +112,12 @@ export function ChecklistNodeComponent({
             >
               <input
                 type="checkbox"
-                checked={checkedItems.has(item)}
-                onChange={() => toggleItem(item)}
+                checked={checkedItems.has(item.text)}
+                onChange={() => toggleItem(item.text)}
                 className="mt-1 h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
               />
               <span className="text-slate-700 leading-relaxed">
-                {formatBoldText(personalizeText(item, childName))}
+                {formatBoldText(personalizeText(item.text, childName))}
               </span>
             </label>
           ))}

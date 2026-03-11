@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_example" },
-        "No": { "next": "evaluate_behaviors" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_example" },
+        { "label": "No", "next": "evaluate_behaviors" }
+      ]
     },
     "ask_yes_example": {
       "type": "instruction",
@@ -18,21 +18,34 @@
       "type": "checklist",
       "instruction": "Does he/she...",
       "items": [
-        "Say \"Look!\" or \"Watch me!\"?",
-        "Babble or make a noise to get you to watch what he/ she is doing?",
-        "Look at you to get praise or comment?",
-        "Keep looking to see if you are looking?",
-        "Other (describe): ________________________________________________"
+        { "text": "Say \"Look!\" or \"Watch me!\"?" },
+        { "text": "Babble or make a noise to get you to watch what he/ she is doing?" },
+        { "text": "Look at you to get praise or comment?" },
+        { "text": "Keep looking to see if you are looking?" },
+        { "text": "Other (describe): ________________________________________________" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "any_selected": { "result_score": 0 },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     }
   },
   "metadata": {

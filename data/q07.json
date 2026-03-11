@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "next": "evaluate_behaviors" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "evaluate_behaviors" }
+      ]
     },
     "ask_yes_followup": {
       "type": "instruction",
@@ -18,36 +18,49 @@
       "type": "checklist",
       "instruction": "Does your child sometimes want you to see something interesting such as....",
       "items": [
-        "An airplane in the sky?",
-        "A truck on the road?",
-        "A bug on the ground?",
-        "An animal in the yard?"
+        { "text": "An airplane in the sky?" },
+        { "text": "A truck on the road?" },
+        { "text": "A bug on the ground?" },
+        { "text": "An animal in the yard?" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "any_selected": { "next": "how_draw_attention" },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [],
+          "next": "how_draw_attention"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     },
     "how_draw_attention": {
       "type": "followup_question",
       "text": "How does your child draw your attention to it? Would he/she point with one finger?",
-      "options": {
-        "Yes": { "next": "check_intent" },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes", "next": "check_intent" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     },
     "check_intent": {
       "type": "followup_question",
       "text": "Is this to show their interest, not to get help?",
-      "options": {
-        "Yes OR both to show interest and to get help": { "result_score": 0 },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes OR both to show interest and to get help", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

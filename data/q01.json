@@ -4,10 +4,10 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_yes_followup" },
-        "No": { "next": "ask_no_followup" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_yes_followup" },
+        { "label": "No", "next": "ask_no_followup" }
+      ]
     },
     "ask_yes_followup": {
       "type": "instruction",
@@ -22,41 +22,79 @@
     "evaluate_behaviors": {
       "type": "checklist",
       "instruction": "Does he/she ...",
-      "categories": {
-        "pass_examples": {
+      "categories": [
+        {
+          "id": "pass_examples",
+          "label": "0 examples",
           "items": [
-            "Look at object?",
-            "Point to object?",
-            "Look and comment on object?",
-            "Look if you point and say \"look!\"?"
+            { "text": "Look at object?" },
+            { "text": "Point to object?" },
+            { "text": "Look and comment on object?" },
+            { "text": "Look if you point and say \"look!\"?" }
           ]
         },
-        "risk_examples": {
+        {
+          "id": "risk_examples",
+          "label": "1 examples",
           "items": [
-            "Ignores you?",
-            "Look around room randomly?",
-            "Look at your finger?"
+            { "text": "Ignores you?" },
+            { "text": "Look around room randomly?" },
+            { "text": "Look at your finger?" }
           ]
         }
-      },
-      "options": ["Yes", "No"],
+      ],
+      "options": [{ "label": "Yes" }, { "label": "No" }],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "only_pass_selected": { "result_score": 0 },
-        "only_risk_selected": { "result_score": 1 },
-        "both_selected": { "next": "clarify_frequency" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "clarify_frequency"
+        },
+        {
+          "type": "fallback",
+          "expression": "none_selected",
+          "actions": [
+            {
+              "type": "require_user_input",
+              "message": "Please select at least one 'Yes' behavior, or verify all behaviors are 'No'."
+            }
+          ],
+          "next": "evaluate_behaviors"
+        }
+      ]
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
-      "options": {
-        "Most often is pass example": { "result_score": 0 },
-        "Most often is risk example": { "result_score": 1 }
-      }
+      "options": [
+        {
+          "label": "Most often is pass example",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "label": "Most often is risk example",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     }
   },
   "metadata": {

@@ -4,26 +4,26 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "ask_brother_sister" },
-        "No": { "next": "ask_supermarket" }
-      }
+      "options": [
+        { "label": "Yes", "next": "ask_brother_sister" },
+        { "label": "No", "next": "ask_supermarket" }
+      ]
     },
     "ask_brother_sister": {
       "type": "followup_question",
       "text": "Is he/she interested in children who are not his/her brother or sister?",
-      "options": {
-        "Yes": { "result_score": 0 },
-        "No": { "next": "how_does_child_respond" }
-      }
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "next": "how_does_child_respond" }
+      ]
     },
     "ask_supermarket": {
       "type": "followup_question",
       "text": "When you are at the playground or supermarket, does your child usually respond to other children?",
-      "options": {
-        "Yes": { "next": "how_does_child_respond" },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes", "next": "how_does_child_respond" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     },
     "how_does_child_respond": {
       "type": "instruction",
@@ -34,31 +34,44 @@
       "type": "checklist",
       "instruction": "Does your child...",
       "items": [
-        "Play with another child?",
-        "Talk to another child?",
-        "Babble or make vocal noises?",
-        "Watch another child?",
-        "Smile at another child?",
-        "Act shy at first but then smile?",
-        "Get excited about another child?"
+        { "text": "Play with another child?" },
+        { "text": "Talk to another child?" },
+        { "text": "Babble or make vocal noises?" },
+        { "text": "Watch another child?" },
+        { "text": "Smile at another child?" },
+        { "text": "Act shy at first but then smile?" },
+        { "text": "Get excited about another child?" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "any_selected": { "next": "check_frequency" },
-        "none_selected": { "result_score": 1 }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [],
+          "next": "check_frequency"
+        },
+        {
+          "type": "selection_count",
+          "expression": "none_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        }
+      ]
     },
     "check_frequency": {
       "type": "followup_question",
       "text": "Does he/she respond to other children more than half of the time?",
-      "options": {
-        "Yes": { "result_score": 0 },
-        "No": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Yes", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

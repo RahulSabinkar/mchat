@@ -4,35 +4,49 @@
   "flow": {
     "start": {
       "type": "initial_question",
-      "options": {
-        "Yes": { "next": "evaluate_triggers" },
-        "No": { "result_score": 0 }
-      }
+      "options": [
+        { "label": "Yes", "next": "evaluate_triggers" },
+        { "label": "No", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" }
+      ]
     },
     "evaluate_triggers": {
       "type": "checklist",
       "instruction": "Does your child have a negative reaction to the sound of...",
       "items": [
-        "A washing machine?",
-        "Babies crying?",
-        "Vacuum cleaner?",
-        "Hairdryer?",
-        "Traffic?",
-        "Babies squealing or screeching?",
-        "Loud music?",
-        "Telephone/ doorbell ringing?",
-        "Noisy places such as a supermarket or restaurant?",
-        "Other (describe): ________________________________________________"
+        { "text": "A washing machine?" },
+        { "text": "Babies crying?" },
+        { "text": "Vacuum cleaner?" },
+        { "text": "Hairdryer?" },
+        { "text": "Traffic?" },
+        { "text": "Babies squealing or screeching?" },
+        { "text": "Loud music?" },
+        { "text": "Telephone/ doorbell ringing?" },
+        { "text": "Noisy places such as a supermarket or restaurant?" },
+        { "text": "Other (describe): ________________________________________________" }
       ],
-      "options": ["Yes", "No"],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_trigger_count"
     },
     "determine_trigger_count": {
-      "type": "decision_logic",
-      "conditions": {
-        "count_threshold": { "min": 0, "max": 1, "result_score": 0 },
-        "any_selected": { "next": "ask_how_react" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "count_threshold",
+          "min": 0,
+          "max": 1,
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "selection_count",
+          "expression": "any_selected",
+          "actions": [],
+          "next": "ask_how_react"
+        }
+      ]
     },
     "ask_how_react": {
       "type": "instruction",
@@ -41,37 +55,62 @@
     },
     "evaluate_behaviors": {
       "type": "checklist",
-      "categories": {
-        "pass_examples": {
+      "instruction": "Does your child...",
+      "categories": [
+        {
+          "id": "pass_examples",
           "instruction": "Does your child...\n(Below are pass examples)",
           "items": [
-            "Calmly cover his/her ears?",
-            "Tell you that he/she does not like the noise?"
+            { "text": "Calmly cover his/her ears?" },
+            { "text": "Tell you that he/she does not like the noise?" }
           ]
         },
-        "risk_examples": {
+        {
+          "id": "risk_examples",
           "instruction": "Does your child...\n(Below are risk examples)",
-          "items": ["Scream?", "Cry?", "Cover his/her ears while upset?"]
+          "items": [
+            { "text": "Scream?" },
+            { "text": "Cry?" },
+            { "text": "Cover his/her ears while upset?" }
+          ]
         }
-      },
-      "options": ["Yes", "No"],
+      ],
+      "options": [
+        { "label": "Yes" },
+        { "label": "No" }
+      ],
       "next": "determine_score"
     },
     "determine_score": {
-      "type": "decision_logic",
-      "conditions": {
-        "only_pass_selected": { "result_score": 0 },
-        "only_risk_selected": { "result_score": 1 },
-        "both_selected": { "next": "clarify_frequency" }
-      }
+      "type": "transient_logic",
+      "conditions": [
+        {
+          "type": "category_selection",
+          "expression": "only_pass_selected",
+          "actions": [{ "type": "set_score", "value": 0 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "only_risk_selected",
+          "actions": [{ "type": "set_score", "value": 1 }],
+          "next": "completed"
+        },
+        {
+          "type": "category_selection",
+          "expression": "both_selected",
+          "actions": [],
+          "next": "clarify_frequency"
+        }
+      ]
     },
     "clarify_frequency": {
       "type": "followup_question",
       "text": "Which one does he/she do most often?",
-      "options": {
-        "Pass response": { "result_score": 0 },
-        "Risk response": { "result_score": 1 }
-      }
+      "options": [
+        { "label": "Pass response", "actions": [{ "type": "set_score", "value": 0 }], "next": "completed" },
+        { "label": "Risk response", "actions": [{ "type": "set_score", "value": 1 }], "next": "completed" }
+      ]
     }
   },
   "metadata": {

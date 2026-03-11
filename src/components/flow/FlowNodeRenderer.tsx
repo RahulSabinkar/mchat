@@ -2,7 +2,7 @@ import type {
   InitialQuestionNode,
   InstructionNode,
   ChecklistNode,
-  DecisionLogicNode,
+  TransientLogicNode,
   FollowupQuestionNode,
   MultipleChoiceNode,
   FlowNode
@@ -10,7 +10,7 @@ import type {
 import { InitialQuestionNodeComponent } from './InitialQuestionNode';
 import { InstructionNodeComponent } from './InstructionNode';
 import { ChecklistNodeComponent } from './ChecklistNode';
-import { DecisionLogicNodeComponent } from './DecisionLogicNode';
+import { TransientLogicNodeComponent } from './TransientLogicNode';
 import { FollowUpQuestionNodeComponent } from './FollowUpQuestionNode';
 import { MultipleChoiceNodeComponent } from './MultipleChoiceNode';
 import type { FlowContext } from '@/utils/flow-engine';
@@ -21,7 +21,7 @@ interface FlowNodeRendererProps {
   onNavigate: (nodeId: string) => void;
   onScore: (score: 0 | 1) => void;
   onSelectOption: (key: string, value: string) => void;
-  onCheckItems: (key: string, items: string[]) => void;
+  onNavigateWithItems: (nodeId: string, key: string, items: string[]) => void;
   onComplete: (hearingTestResult?: string) => void;
 }
 
@@ -31,7 +31,7 @@ export function FlowNodeRenderer({
   onNavigate,
   onScore,
   onSelectOption,
-  onCheckItems,
+  onNavigateWithItems,
   onComplete,
 }: FlowNodeRendererProps) {
   switch (node.type) {
@@ -62,16 +62,14 @@ export function FlowNodeRenderer({
         <ChecklistNodeComponent
           node={node as ChecklistNode}
           context={context}
-          onNavigate={onNavigate}
-          onCheckItems={onCheckItems}
-          onComplete={onComplete}
+          onNavigateWithItems={onNavigateWithItems}
         />
       );
     
-    case 'decision_logic':
+    case 'transient_logic':
       return (
-        <DecisionLogicNodeComponent
-          node={node as DecisionLogicNode}
+        <TransientLogicNodeComponent
+          node={node as TransientLogicNode}
           context={context}
           onNavigate={onNavigate}
           onScore={onScore}

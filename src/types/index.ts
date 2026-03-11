@@ -47,29 +47,37 @@ export interface FollowUpFlowState {
   checkedItems: Record<string, string[]>;
 }
 
-export type FlowTarget = { next: string; result_score?: 0 | 1 } | { result_score: 0 | 1; next?: string };
+export interface FlowAction {
+  type: 'set_score' | 'set_result' | 'navigate';
+  value?: 0 | 1 | string;
+}
 
-export interface CountThresholdCondition {
+export interface FlowCondition {
+  type: 'category_selection' | 'selection_count' | 'semantic' | 'always' | 'fallback' | 'count_threshold';
+  expression?: string;
   min?: number;
   max?: number;
+  actions: FlowAction[];
   next?: string;
-  result_score?: 0 | 1;
+}
+
+export interface FlowOption {
+  label: string;
+  next?: string;
+  actions?: FlowAction[];
 }
 
 export type FlowNode = 
   | InitialQuestionNode
   | InstructionNode
   | ChecklistNode
-  | DecisionLogicNode
+  | TransientLogicNode
   | FollowupQuestionNode
   | MultipleChoiceNode;
 
 export interface InitialQuestionNode {
   type: 'initial_question';
-  options: {
-    Yes: FlowTarget;
-    No: FlowTarget;
-  };
+  options: FlowOption[];
 }
 
 export interface InstructionNode {
@@ -78,35 +86,30 @@ export interface InstructionNode {
   next: string;
 }
 
+export interface ChecklistCategory {
+  id: string;
+  instruction?: string;
+  items: { text: string }[];
+}
+
 export interface ChecklistNode {
   type: 'checklist';
   instruction?: string;
-  categories?: {
-    pass_examples?: { instruction?: string; items: string[] };
-    risk_examples?: { instruction?: string; items: string[] };
-  };
-  items?: string[];
-  options: ['Yes', 'No'];
+  categories?: ChecklistCategory[];
+  items?: { text: string }[];
+  options: FlowOption[];
   next: string;
 }
 
-export interface DecisionLogicNode {
-  type: 'decision_logic';
-  conditions: {
-    only_pass_selected?: FlowTarget;
-    only_risk_selected?: FlowTarget;
-    both_selected?: FlowTarget;
-    any_selected?: FlowTarget;
-    none_selected?: FlowTarget;
-    count_threshold?: CountThresholdCondition;
-  };
-  semantic_conditions?: Record<string, FlowTarget>;
+export interface TransientLogicNode {
+  type: 'transient_logic';
+  conditions: FlowCondition[];
 }
 
 export interface FollowupQuestionNode {
   type: 'followup_question';
   text: string;
-  options: Record<string, FlowTarget>;
+  options: FlowOption[];
 }
 
 export interface MultipleChoiceNode {
